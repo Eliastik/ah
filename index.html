@@ -13,7 +13,7 @@
                 max-width: 100%;
                 height: auto;
             }
-            #compa {
+            #compa, #errorLoading {
                 display: none;
             }
             .mb {
@@ -30,6 +30,8 @@
         </div>
     </nav>
     <div class="container well">
+        <div class="alert alert-info" id="loading"></div>
+        <div class="alert alert-danger" id="errorLoading"></div>
         <div class="mb"><img src="" onclick="ah_click();" id="ah_img" /></div>
         <div class="row"><div class="col-sm-2 col-md-2"><ul class="list-group"><li class="list-group-item"><span class="badge" id="nb_ah"></span> Ah prononcés</li></ul></div></div>
         <form>
@@ -52,20 +54,20 @@
             interval = 0;
             img_ah_src = "assets/img/ah.gif";
             document.getElementById("checkFull").checked = false;
-            function checkAudio() {
+            function checkAudio(type) {
                 if(!window.HTMLAudioElement) {
                     return false;
                 }
 
                 var audio = document.createElement("audio");
 
-                if(!audio.canPlayType("audio/mp3")) {
+                if(!audio.canPlayType(type)) {
                     return "no mp3 support";
                 }
 
                 return true;
             }
-            checkAudio = checkAudio();
+            checkAudio = checkAudio("audio/mp3");
             function full() {
                 if(document.getElementById("checkFull").checked == true) {
                     img_ah_src = "assets/img/ah_full.gif";
@@ -90,7 +92,7 @@
             function ah_interval() {
                 clearInterval(interval);
                 ah();
-                interval = setInterval(ah, 500);
+                interval = setInterval(ah, 200);
             }
             function ah_stop() {
                 clearInterval(interval);
@@ -106,8 +108,32 @@
                 if(checkAudio == true) ah.play();
                 document.getElementById("nb_ah").innerHTML = nb_ah;
             }
-            window.onload = function() {
+            function preloadImages() {
+                document.getElementById("loading").style.display = "block";
+                document.getElementById("loading").innerHTML = "Chargement des images : 0/2";
+                var loadedImagesCount = 0;
+                var imageNames = ['assets/img/ah.gif','assets/img/ah_full.gif'];
+                var imagesArray = [];
+                for (var i = 0; i < imageNames.length; i++) {
+                    var image = new Image();
+                    image.src = imageNames[i];
+                    image.onload = function() {
+                        loadedImagesCount++;
+                        document.getElementById("loading").innerHTML = "Chargement des images : "+ loadedImagesCount +"/2";
+                    };
+                    image.onerror = function() {
+                        errorLoadingImages = true;
+                        document.getElementById("errorLoading").style.display = "block";
+                        document.getElementById("loading").innerHTML = "Chargement des images : "+ loadedImagesCount +"/2";
+                    };
+                    imagesArray.push(image);
+                }
+                document.getElementById("loading").style.display = "none";
                 ah_click();
+                return true;
+            }
+            window.onload = function() {
+                preloadImages();
                 if(checkAudio == false) {
                     document.getElementById("compa").style.display = "block";
                     document.getElementById("compa").innerHTML = "Votre navigateur supporte pas la lecture de fichiers audio. Vous n'entendrez pas le ah de Denis Brogniart !";document.getElementById("checkSound").disabled = true;
