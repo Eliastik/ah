@@ -1,19 +1,19 @@
 <html>
     <head>
-        <title>Denis Brogniart - Ah !</title>
+        <title>Denis Brogniart – Ah !</title>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, user-scalable=no" />
         <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css" />
         <link rel="icon" type="image/x-icon" href="favicon.ico" />
         <style type="text/css">
-            #ah_img, button {
+            #ah_img, button, label {
                 cursor: pointer;
             }
             img {
                 max-width: 100%;
                 height: auto;
             }
-            #compa, #errorLoading {
+            #compa, #errorLoading, #formInterval {
                 display: none;
             }
             .mb {
@@ -23,37 +23,52 @@
     </head>
     <body>
         <nav class="navbar navbar-inverse">
-          <div class="container-fluid">
-            <div class="navbar-header">
-              <span class="navbar-brand"><span class="title-align">Denis Brogniart - Ah !</span></span>
+            <div class="container-fluid">
+                <div class="navbar-header">
+                  <span class="navbar-brand"><span class="title-align">Denis Brogniart – Ah !</span></span>
+                </div>
             </div>
+        </nav>
+        <div class="container well">
+            <div class="alert alert-info" id="loading"></div>
+            <div class="alert alert-danger" id="errorLoading"></div>
+            <div class="alert alert-danger" id="compa"></div>
+            <div class="mb"><img src="" onclick="ah_click();" id="ah_img" title="Cliquez ici !" /></div>
+            <div class="row"><div class="col-sm-2 col-md-2"><ul class="list-group"><li class="list-group-item"><span class="badge" id="nb_ah"></span> Ah prononcés</li></ul></div></div>
+            <div class="row">
+                <div class="col-md-4 col-sm-6">
+                    <form>
+                        <div class="form-group">
+                            <button type="button" class="btn btn-primary" href="#null" onclick="ah_interval();">Répéter</button>
+                            <button type="button" class="btn btn-danger" href="#null" onclick="ah_stop();">Stop</button>
+                        </div>
+                        <div class="form-group" id="formInterval">
+                            <label for="inputInterval">Intervalle de répétition (millisecondes) :</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="inputInterval" value="500" placeholder="Entrez l'intervalle (ex : 500 ms)" />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" id="validInputInterval" onclick="validInterval();">Valider</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="checkbox">
+                            <label for="checkFull"><input type="checkbox" id="checkFull" onchange="full()" /> Scène entière</label>
+                        </div>
+                        <div class="checkbox" id="checkSoundDiv">
+                            <label for="checkSound"><input type="checkbox" id="checkSound" onchange="stopSound()" /> Couper le son</label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <p>By <a href="http://www.eliastiksofts.com" target="_blank">Eliastik</a> – <a href="https://github.com/Eliastik/ah" target="_blank">Projet sur Github</a> – <a href="http://www.eliastiksofts.com/ah/downloads/" target="_blank">Télécharger le projet</a></p>
         </div>
-    </nav>
-    <div class="container well">
-        <div class="alert alert-info" id="loading"></div>
-        <div class="alert alert-danger" id="errorLoading"></div>
-        <div class="mb"><img src="" onclick="ah_click();" id="ah_img" /></div>
-        <div class="row"><div class="col-sm-2 col-md-2"><ul class="list-group"><li class="list-group-item"><span class="badge" id="nb_ah"></span> Ah prononcés</li></ul></div></div>
-        <form>
-            <div class="control-group">
-                <button type="button" class="btn btn-primary" href="#null" onclick="ah_interval();">Répéter</button>
-                <button type="button" class="btn btn-danger" href="#null" onclick="ah_stop();">Stop</button>
-            </div>
-            <div class="checkbox">
-                <label for="checkFull"><input type="checkbox" id="checkFull" onchange="full()" /> Scène entière</label>
-            </div>
-            <div class="checkbox" id="checkSoundDiv">
-                <label for="checkSound"><input type="checkbox" id="checkSound" onchange="stopSound()" /> Couper le son</label>
-            </div>
-        </form>
-        <div class="alert alert-danger" id="compa"></div>
-    </div>
         <script type="text/javascript">
             nb_ah = 0;
             timeout = 0;
             interval = 0;
             img_ah_src = "assets/img/ah.gif";
             document.getElementById("checkFull").checked = false;
+            repetitionInterval = 500;
             function checkAudio(type) {
                 if(!window.HTMLAudioElement) {
                     return false;
@@ -92,11 +107,25 @@
             function ah_interval() {
                 clearInterval(interval);
                 ah();
-                interval = setInterval(ah, 200);
+                interval = setInterval(ah, repetitionInterval);
+                document.getElementById("formInterval").style.display = "block";
             }
             function ah_stop() {
                 clearInterval(interval);
                 clearTimeout(timeout);
+                document.getElementById("formInterval").style.display = "none";
+            }
+            function validInterval() {
+                var tmp_interval = document.getElementById("inputInterval").value;
+                if(isNaN(tmp_interval) || tmp_interval == "" || tmp_interval <= 10) {
+                    alert("Intervalle invalide !");
+                    document.getElementById("inputInterval").value = repetitionInterval;
+                    return false;
+                } else {
+                    repetitionInterval = tmp_interval;
+                    ah_stop();
+                    ah_interval();
+                }
             }
             function ah() {
                 if(checkAudio == true) {
@@ -147,6 +176,6 @@
                     document.getElementById("checkSoundDiv").setAttribute("class", "checkbox disabled");
                 }
             }
-         </script>
+        </script>
     </body>
 </html>
