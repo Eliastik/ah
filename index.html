@@ -149,16 +149,24 @@
                     image.onload = function() {
                         loadedImagesCount++;
                         document.getElementById("loading").innerHTML = "Chargement des images : "+ loadedImagesCount +"/2";
+                        
+                        if (loadedImagesCount >= imageNames.length) {
+                            document.getElementById("loading").style.display = "none";
+                            ah_click();
+                        }
                     };
                     image.onerror = function() {
                         errorLoadingImages = true;
                         document.getElementById("errorLoading").style.display = "block";
                         document.getElementById("loading").innerHTML = "Chargement des images : "+ loadedImagesCount +"/2";
+                        
+                        if (loadedImagesCount >= imageNames.length) {
+                            document.getElementById("loading").style.display = "none";
+                            ah_click();
+                        }
                     };
                     imagesArray.push(image);
                 }
-                document.getElementById("loading").style.display = "none";
-                ah_click();
                 return true;
             }
             window.onload = function() {
