@@ -165,12 +165,13 @@
                 preloadImages();
                 if(checkAudio == false) {
                     document.getElementById("compa").style.display = "block";
-                    document.getElementById("compa").innerHTML = "Votre navigateur supporte pas la lecture de fichiers audio. Vous n'entendrez pas le ah de Denis Brogniart !";document.getElementById("checkSound").disabled = true;
+                    document.getElementById("compa").innerHTML = "Votre navigateur ne supporte pas la lecture de fichiers audio. Vous n'entendrez pas le ah de Denis Brogniart !";
+                    document.getElementById("checkSound").disabled = true;
                     document.getElementById("checkSound").checked = true;
                     document.getElementById("checkSoundDiv").setAttribute("class", "checkbox disabled");
                 } else if(checkAudio == "no mp3 support") {
                     document.getElementById("compa").style.display = "block";
-                    document.getElementById("compa").innerHTML = "Votre navigateur supporte la lecture de fichiers audio, mais il ne peut pas lire le format mp3. Vous n'entendrez pas le ah de Denis Brogniart !";
+                    document.getElementById("compa").innerHTML = "Votre navigateur supporte la lecture de fichiers audio, mais il ne peut pas lire le format MP3. Vous n'entendrez pas le ah de Denis Brogniart !";
                     document.getElementById("checkSound").disabled = true;
                     document.getElementById("checkSound").checked = true;
                     document.getElementById("checkSoundDiv").setAttribute("class", "checkbox disabled");
