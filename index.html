@@ -1,0 +1,126 @@
+<html>
+    <head>
+        <title>Denis Brogniart - Ah !</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, user-scalable=no" />
+        <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css" />
+        <link rel="icon" type="image/x-icon" href="favicon.ico" />
+        <style type="text/css">
+            #ah_img, button {
+                cursor: pointer;
+            }
+            img {
+                max-width: 100%;
+                height: auto;
+            }
+            #compa {
+                display: none;
+            }
+            .mb {
+                margin-bottom: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <span class="navbar-brand"><span class="title-align">Denis Brogniart - Ah !</span></span>
+            </div>
+        </div>
+    </nav>
+    <div class="container well">
+        <div class="mb"><img src="" onclick="ah_click();" id="ah_img" /></div>
+        <div class="row"><div class="col-sm-2 col-md-2"><ul class="list-group"><li class="list-group-item"><span class="badge" id="nb_ah"></span> Ah prononcés</li></ul></div></div>
+        <form>
+            <div class="control-group">
+                <button type="button" class="btn btn-primary" href="#null" onclick="ah_interval();">Répéter</button>
+                <button type="button" class="btn btn-danger" href="#null" onclick="ah_stop();">Stop</button>
+            </div>
+            <div class="checkbox">
+                <label for="checkFull"><input type="checkbox" id="checkFull" onchange="full()" /> Scène entière</label>
+            </div>
+            <div class="checkbox" id="checkSoundDiv">
+                <label for="checkSound"><input type="checkbox" id="checkSound" onchange="stopSound()" /> Couper le son</label>
+            </div>
+        </form>
+        <div class="alert alert-danger" id="compa"></div>
+    </div>
+        <script type="text/javascript">
+            nb_ah = 0;
+            timeout = 0;
+            interval = 0;
+            img_ah_src = "assets/img/ah.gif";
+            document.getElementById("checkFull").checked = false;
+            function checkAudio() {
+                if(!window.HTMLAudioElement) {
+                    return false;
+                }
+
+                var audio = document.createElement("audio");
+
+                if(!audio.canPlayType("audio/mp3")) {
+                    return "no mp3 support";
+                }
+
+                return true;
+            }
+            checkAudio = checkAudio();
+            function full() {
+                if(document.getElementById("checkFull").checked == true) {
+                    img_ah_src = "assets/img/ah_full.gif";
+                    img_ah_type = 2;
+                } else {
+                    img_ah_src = "assets/img/ah.gif";
+                    img_ah_type = 1;
+                }
+                ah();
+            }
+            function stopSound() {
+                if(document.getElementById("checkSound").checked == true) {
+                    checkAudio = false;
+                } else {
+                    checkAudio = true;
+                }
+            }
+            function ah_click() {
+                clearTimeout(timeout);
+                timeout = setTimeout(ah, 100);
+            }
+            function ah_interval() {
+                clearInterval(interval);
+                ah();
+                interval = setInterval(ah, 500);
+            }
+            function ah_stop() {
+                clearInterval(interval);
+                clearTimeout(timeout);
+            }
+            function ah() {
+                if(checkAudio == true) {
+                    var ah = new Audio();
+                    ah.src = "assets/sounds/ah.mp3";
+                }
+                nb_ah = nb_ah + 1;
+                document.getElementById("ah_img").src = img_ah_src;
+                if(checkAudio == true) ah.play();
+                document.getElementById("nb_ah").innerHTML = nb_ah;
+            }
+            window.onload = function() {
+                ah_click();
+                if(checkAudio == false) {
+                    document.getElementById("compa").style.display = "block";
+                    document.getElementById("compa").innerHTML = "Votre navigateur supporte pas la lecture de fichiers audio. Vous n'entendrez pas le ah de Denis Brogniart !";document.getElementById("checkSound").disabled = true;
+                    document.getElementById("checkSound").checked = true;
+                    document.getElementById("checkSoundDiv").setAttribute("class", "checkbox disabled");
+                } else if(checkAudio == "no mp3 support") {
+                    document.getElementById("compa").style.display = "block";
+                    document.getElementById("compa").innerHTML = "Votre navigateur supporte la lecture de fichiers audio, mais il ne peut pas lire le format mp3. Vous n'entendrez pas le ah de Denis Brogniart !";
+                    document.getElementById("checkSound").disabled = true;
+                    document.getElementById("checkSound").checked = true;
+                    document.getElementById("checkSoundDiv").setAttribute("class", "checkbox disabled");
+                }
+            }
+         </script>
+    </body>
+</html>
