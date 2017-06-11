@@ -13,7 +13,7 @@
                 max-width: 100%;
                 height: auto;
             }
-            #compa, #errorLoading, #formInterval {
+            #compa, #errorLoading, #formInterval, #ah_img {
                 display: none;
             }
             .mb {
@@ -31,16 +31,16 @@
         </nav>
         <div class="container well">
             <div class="alert alert-info" id="loading"></div>
-            <div class="alert alert-danger" id="errorLoading">Erreur de chargement des images. Vérifiez votre connexion Internet puis <a href="#" onclick="location.reload();">rechargez la page</a>.</div>
+            <div class="alert alert-danger" id="errorLoading">Une erreur de connexion est surveneue lors du chargement des images. Vérifiez votre connexion Internet puis <a href="#" onclick="location.reload();">rechargez la page</a>.</div>
             <div class="alert alert-danger" id="compa"></div>
-            <div class="mb"><img src="" onclick="ah_click();" id="ah_img" title="Cliquez ici !" /></div>
-            <div class="row"><div class="col-sm-2 col-md-2"><ul class="list-group"><li class="list-group-item"><span class="badge" id="nb_ah"></span> Ah prononcés</li></ul></div></div>
+            <div class="mb"><img src="" id="ah_img" title="Cliquez ici !" /></div>
+            <div class="row"><div class="col-sm-2 col-md-2"><ul class="list-group"><li class="list-group-item"><span class="badge" id="nb_ah">0</span> Ah prononcés</li></ul></div></div>
             <div class="row">
                 <div class="col-md-4 col-sm-6">
                     <form>
                         <div class="form-group">
-                            <button type="button" class="btn btn-primary" href="#null" onclick="ah_interval();">Répéter</button>
-                            <button type="button" class="btn btn-danger" href="#null" onclick="ah_stop();">Stop</button>
+                            <button type="button" class="btn btn-primary" href="#null" onclick="ah_interval();" id="repeat" disabled="disabled">Répéter</button>
+                            <button type="button" class="btn btn-danger" href="#null" onclick="ah_stop();" id="stop" disabled="disabled">Stop</button>
                         </div>
                         <div class="form-group" id="formInterval">
                             <label for="inputInterval">Intervalle de répétition (millisecondes) :</label>
@@ -51,11 +51,11 @@
                                 </span>
                             </div>
                         </div>
-                        <div class="checkbox">
-                            <label for="checkFull"><input type="checkbox" id="checkFull" onchange="full()" /> Scène entière</label>
+                        <div class="checkbox disabled" id="checkFullDiv">
+                            <label for="checkFull"><input type="checkbox" id="checkFull" onchange="full()" disabled="disabled" /> Scène entière</label>
                         </div>
-                        <div class="checkbox" id="checkSoundDiv">
-                            <label for="checkSound"><input type="checkbox" id="checkSound" onchange="stopSound()" /> Couper le son</label>
+                        <div class="checkbox disabled" id="checkSoundDiv">
+                            <label for="checkSound"><input type="checkbox" id="checkSound" onchange="stopSound()" disabled="disabled" /> Couper le son</label>
                         </div>
                     </form>
                 </div>
@@ -151,39 +151,49 @@
                         document.getElementById("loading").innerHTML = "Chargement des images : "+ loadedImagesCount +"/2";
                         
                         if (loadedImagesCount >= imageNames.length) {
-                            document.getElementById("loading").style.display = "none";
-                            ah_click();
+                            endInit();
                         }
                     };
                     image.onerror = function() {
                         errorLoadingImages = true;
+                        loadedImagesCount++;
                         document.getElementById("errorLoading").style.display = "block";
                         document.getElementById("loading").innerHTML = "Chargement des images : "+ loadedImagesCount +"/2";
                         
                         if (loadedImagesCount >= imageNames.length) {
-                            document.getElementById("loading").style.display = "none";
-                            ah_click();
+                            endInit();
                         }
                     };
                     imagesArray.push(image);
                 }
                 return true;
             }
-            window.onload = function() {
+            function init() {
                 preloadImages();
                 if(checkAudio == false) {
                     document.getElementById("compa").style.display = "block";
                     document.getElementById("compa").innerHTML = "Votre navigateur ne supporte pas la lecture de fichiers audio. Vous n'entendrez pas le ah de Denis Brogniart !";
-                    document.getElementById("checkSound").disabled = true;
-                    document.getElementById("checkSound").checked = true;
-                    document.getElementById("checkSoundDiv").setAttribute("class", "checkbox disabled");
                 } else if(checkAudio == "no mp3 support") {
                     document.getElementById("compa").style.display = "block";
                     document.getElementById("compa").innerHTML = "Votre navigateur supporte la lecture de fichiers audio, mais il ne peut pas lire le format MP3. Vous n'entendrez pas le ah de Denis Brogniart !";
-                    document.getElementById("checkSound").disabled = true;
-                    document.getElementById("checkSound").checked = true;
-                    document.getElementById("checkSoundDiv").setAttribute("class", "checkbox disabled");
+                } else {
+                    document.getElementById("checkSound").disabled = false;
+                    document.getElementById("checkSound").checked = false;
+                    document.getElementById("checkSoundDiv").setAttribute("class", "checkbox");
                 }
+            }
+            function endInit() {
+                document.getElementById("checkFull").disabled = false;
+                document.getElementById("checkFullDiv").setAttribute("class", "checkbox");
+                document.getElementById("repeat").disabled = false;
+                document.getElementById("stop").disabled = false;
+                document.getElementById("ah_img").setAttribute("onclick", "ah_click();");
+                document.getElementById("ah_img").style.display = "block";
+                document.getElementById("loading").style.display = "none";
+                ah_click();
+            }
+            window.onload = function() {
+                init();
             }
         </script>
     </body>
