@@ -1,0 +1,20 @@
+{
+  "short_name": "Denis Brogniart – Ah !",
+  "name": "Denis Brogniart – Ah !",
+  "background_color": "#2780e3",
+  "theme_color": "#2780e3",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "64x64"
+    },
+    {
+      "src": "assets/img/favicon.png",
+      "type": "image/png",
+      "sizes": "193x193"
+    }
+  ],
+  "start_url": "index.html?launcher=true"
+}
