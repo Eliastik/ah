@@ -128,7 +128,7 @@
             }
             function validInterval() {
                 var tmp_interval = document.getElementById("inputInterval").value;
-                if(isNaN(tmp_interval) || tmp_interval == "" || tmp_interval <= 10) {
+                if(isNaN(tmp_interval) || tmp_interval == "" || tmp_interval <= 10 || tmp_interval > 2147483647) { // max. interval number = 2147483647 ( https://stackoverflow.com/a/39007143 )
                     alert("Intervalle invalide !");
                     document.getElementById("inputInterval").value = repetitionInterval;
                     return false;
