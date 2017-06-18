@@ -4,6 +4,7 @@
   "background_color": "#2780e3",
   "theme_color": "#2780e3",
   "display": "standalone",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "favicon.ico",
