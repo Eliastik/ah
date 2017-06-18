@@ -154,7 +154,7 @@
                     image.onload = function() {
                         loadedImagesCount++;
                         document.getElementById("loading").innerHTML = "Chargement des images : "+ loadedImagesCount +"/2";
-                        
+
                         if (loadedImagesCount >= imageNames.length) {
                             endInit();
                         }
@@ -164,7 +164,7 @@
                         loadedImagesCount++;
                         document.getElementById("errorLoading").style.display = "block";
                         document.getElementById("loading").innerHTML = "Chargement des images : "+ loadedImagesCount +"/2";
-                        
+
                         if (loadedImagesCount >= imageNames.length) {
                             endInit();
                         }
