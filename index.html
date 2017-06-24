@@ -74,14 +74,16 @@
             <p class="small">Version 1.0.1</p>
         </div>
         <script type="text/javascript">
-            nb_ah = 0;
-            timeout = 0;
-            interval = 0;
-            img_ah_src = "assets/img/ah.gif";
+            // Pure JS. No Jquery.
+            var nb_ah = 0;
+            var timeout = 0;
+            var interval = 0;
+            var img_ah_src = "assets/img/ah.gif";
             document.getElementById("checkFull").checked = false;
-            repetitionInterval = 500;
-            imgArray = ['assets/img/ah.gif','assets/img/ah_full.gif'];
-            audioArray = ['assets/sounds/ah.mp3'];
+            var repetitionInterval = 500;
+            var imgArray = ['assets/img/ah.gif', 'assets/img/ah_full.gif'];
+            var audioArray = ['assets/sounds/ah.mp3'];
+
             function checkAudio(type) {
                 if(!window.HTMLAudioElement) {
                     return false;
@@ -95,7 +97,9 @@
 
                 return true;
             }
-            checkAudio = checkAudio("audio/mp3");
+
+            var checkAudio = checkAudio("audio/mp3");
+
             function full() {
                 if(document.getElementById("checkFull").checked == true) {
                     img_ah_src = "assets/img/ah_full.gif";
@@ -106,6 +110,7 @@
                 }
                 ah();
             }
+
             function stopSound() {
                 if(document.getElementById("checkSound").checked == true) {
                     checkAudio = false;
@@ -113,21 +118,25 @@
                     checkAudio = true;
                 }
             }
+
             function ah_click() {
                 clearTimeout(timeout);
                 timeout = setTimeout(ah, 100);
             }
+
             function ah_interval() {
                 clearInterval(interval);
                 ah();
                 interval = setInterval(ah, repetitionInterval);
                 document.getElementById("formInterval").style.display = "block";
             }
+
             function ah_stop() {
                 clearInterval(interval);
                 clearTimeout(timeout);
                 document.getElementById("formInterval").style.display = "none";
             }
+
             function validInterval() {
                 var tmp_interval = document.getElementById("inputInterval").value;
                 if(isNaN(tmp_interval) || tmp_interval == "" || tmp_interval <= 10 || tmp_interval > 2147483647) { // max. interval number = 2147483647 ( https://stackoverflow.com/a/39007143 )
@@ -138,8 +147,11 @@
                     repetitionInterval = tmp_interval;
                     ah_stop();
                     ah_interval();
+                    return true;
                 }
+                return false;
             }
+
             function ah() {
                 if(checkAudio == true) {
                     var ah = new Audio();
@@ -150,6 +162,7 @@
                 if(checkAudio == true) ah.play();
                 document.getElementById("nb_ah").innerHTML = nb_ah;
             }
+
             function preloadImages(array) {
                 document.getElementById("loading").style.display = "block";
                 document.getElementById("loading").innerHTML = "Chargement des images : 0/" + array.length;
@@ -181,6 +194,7 @@
                 }
                 return true;
             }
+
             function preloadAudios(array) {
                 if (window.HTMLAudioElement) {
                     var audioTestMp3 = document.createElement('audio');
@@ -217,7 +231,7 @@
                                         loadedAudioCount++;
                                         var pourcentageLoadingAudio = Math.round((100*loadedAudioCount)/audioFiles.length);
                                         document.getElementById("loading").innerHTML = "Chargement des sons : "+ loadedAudioCount +"/"+ array.length;
-                                        
+
                                         if (loadedAudioCount >= audioFiles.length) {
                                             endInit();
                                         }
@@ -236,6 +250,7 @@
                     endInit();
                 }
             }
+
             function init() {
                 preloadImages(imgArray);
                 if(checkAudio == false) {
@@ -250,6 +265,7 @@
                     document.getElementById("checkSoundDiv").setAttribute("class", "checkbox");
                 }
             }
+
             function endInit() {
                 document.getElementById("checkFull").disabled = false;
                 document.getElementById("checkFullDiv").setAttribute("class", "checkbox");
@@ -260,6 +276,7 @@
                 document.getElementById("loading").style.display = "none";
                 ah_click();
             }
+
             window.onload = function() {
                 init();
             }
