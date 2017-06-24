@@ -224,7 +224,7 @@
                         };
                         var timeOutLoading = setTimeout(function() {
                             if(loadedAudioCount == 0) {
-                                hacklol.completeLoading();
+                                endInit();
                             }
                         }, 5000);
                         for (var i in audioFiles) {
