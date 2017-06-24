@@ -14,7 +14,7 @@ Version en ligne de ce programme : [www.eliastiksofts.com/ah](http://www.eliasti
 ## Journal des changements
 
 * Version 1.0.2 (24/06/2017) :
-    - Ajout du préchargement des données audio (code extrait d'un autre de mes projets, [Hacklol](https://hacklol.eliastiksofts.com)) ;
+    - Ajout du préchargement des données audio (code extrait d'un autre de mes projets, [Hacklol](http://hacklol.eliastiksofts.com)) ;
     - Correction du code de préchargement des images ;
     - Le chargement des images et données audio ont désormais lieu après le chargement de toute la page ;
     - Autres petites corrections et ajouts.
