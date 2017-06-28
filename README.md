@@ -33,7 +33,7 @@ Version en ligne de ce programme : [www.eliastiksofts.com/ah](http://www.eliasti
 
 ## Déclaration de licence
 
-Copyright (C) 2015-2017 Eliastik (eliastiksofts.com)
+Copyright (C) 2017 Eliastik (eliastiksofts.com)
 
 Ce programme est un logiciel libre ; vous pouvez le redistribuer ou le modifier suivant les termes de la GNU General Public License telle que publiée par la Free Software Foundation ; soit la version 3 de la licence, soit (à votre gré) toute version ultérieure.
 
@@ -43,7 +43,7 @@ Vous devez avoir reçu une copie de la GNU General Public License en même temps
 
 ----
 
-Copyright (C) 2015-2017 Eliastik (eliastiksofts.com)
+Copyright (C) 2017 Eliastik (eliastiksofts.com)
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
