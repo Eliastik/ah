@@ -2,16 +2,24 @@
 
 Le fameux Ah de Denis Brogniart, directement sur votre navigateur web !
 
-Version en ligne de ce programme : [www.eliastiksofts.com/ah](http://www.eliastiksofts.com/ah/)
+Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois que vous voulez sur Denis pour qu'il dise Ah, ou faites le répéter en cliquant sur le bouton prévu pour cela.
+
+* Version en ligne de ce programme : [www.eliastiksofts.com/ah](http://www.eliastiksofts.com/ah/)
 
 ## A propos du programme
-* Version du programme : 1.0.2 (24/06/2017)
+
+* Version du programme : 1.0.3 (18/07/2017)
 * Made in France by Eliastik - [eliastiksofts.com](http://eliastiksofts.com) - Contact : [eliastiksofts.com/contact](http://eliastiksofts.com/contact)
 * Licence : GNU GPLv3 ([https://github.com/Eliastik/ah/blob/master/LICENCE.txt](https://github.com/Eliastik/ah/blob/master/LICENCE.txt))
 * Utilise le thème Bootstrap Cosmo de Bootswatch ([https://bootswatch.com/cosmo/](https://bootswatch.com/cosmo/)), sous licence MIT - ([https://tldrlegal.com/license/mit-license](https://tldrlegal.com/license/mit-license))
+* Utilise la police d'icônes [Font Awesome](http://fontawesome.io/), sous licence SIL OFL 1.1 ([http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL](http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL)) et MIT ([https://tldrlegal.com/license/mit-license](https://tldrlegal.com/license/mit-license))
 * Le Ah de Denis Brogniart vient de cette vidéo : [https://www.youtube.com/watch?v=6oTsleGsWT8](https://www.youtube.com/watch?v=6oTsleGsWT8)
 
 ## Journal des changements
+
+* Version 1.0.3 (18/07/2017) :
+    - Ajout d'icônes ([Font Awesome](http://fontawesome.io/)) ;
+    - Petites corrections (design, textes, autres).
 
 * Version 1.0.2 (24/06/2017) :
     - Ajout du préchargement des données audio (code extrait d'un autre de mes projets, [Hacklol](http://hacklol.eliastiksofts.com)) ;
