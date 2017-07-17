@@ -44,7 +44,7 @@
         </nav>
         <div class="container well">
             <div class="alert alert-info" id="loading"></div>
-            <div class="alert alert-danger" id="errorLoading">Une erreur de connexion est surveneue lors du chargement des images. Vérifiez votre connexion Internet puis <a href="#" onclick="location.reload();">rechargez la page</a>.</div>
+            <div class="alert alert-danger" id="errorLoading">Une erreur de connexion est survenue lors du chargement des images. Vérifiez votre connexion Internet puis <a href="#" onclick="location.reload();">rechargez la page</a>.</div>
             <div class="alert alert-danger" id="compa"></div>
             <p id="description">Le fameux Ah de Denis Brogniart ! Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois que vous voulez sur Denis pour qu'il dise Ah, ou faites le répéter en cliquant sur le bouton prévu pour cela.</p>
             <div class="mb"><img src="" id="ah_img" /></div>
@@ -261,10 +261,10 @@
                 preloadImages(imgArray);
                 if(checkAudio == false) {
                     document.getElementById("compa").style.display = "block";
-                    document.getElementById("compa").innerHTML = "Votre navigateur ne supporte pas la lecture de fichiers audio. Vous n'entendrez pas le ah de Denis Brogniart !";
+                    document.getElementById("compa").innerHTML = "Votre navigateur ne supporte pas la lecture de fichiers audio. Vous n'entendrez pas le Ah de Denis Brogniart !";
                 } else if(checkAudio == "no mp3 support") {
                     document.getElementById("compa").style.display = "block";
-                    document.getElementById("compa").innerHTML = "Votre navigateur supporte la lecture de fichiers audio, mais il ne peut pas lire le format MP3. Vous n'entendrez pas le ah de Denis Brogniart !";
+                    document.getElementById("compa").innerHTML = "Votre navigateur supporte la lecture de fichiers audio, mais il ne peut pas lire le format MP3. Vous n'entendrez pas le Ah de Denis Brogniart !";
                 } else {
                     document.getElementById("checkSound").disabled = false;
                     document.getElementById("checkSound").checked = false;
