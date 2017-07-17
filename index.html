@@ -33,50 +33,93 @@
             #description {
                 font-size: 12pt;
             }
+            .navbar-brand > img {
+                height: 100%;
+                width: auto;
+                display: inline-block;
+            }
+            .navbar-brand > span {
+                vertical-align: middle;
+            }
+            /* https://codepen.io/jamesbarnett/pen/yILjk */
+            input[type=checkbox] {
+                display:none;
+            }
+            input[type=checkbox] + label:before {
+                font-family: FontAwesome;
+                display: inline-block;
+            }
+            input[type=checkbox] + label:before {
+                content: "\f096";
+            }
+            input[type=checkbox] + label:before {
+                letter-spacing: 5px;
+            }
+            input[type=checkbox]:checked + label:before {
+                content: "\f046";
+            }
+            input[type=checkbox]:checked + label:before {
+                letter-spacing: 5px;
+            }
+            div.disabled {
+                color: grey;
+            }
+            div.checkbox {
+                font-size: 12.5pt;
+            }
+            label {
+                padding: 0 !important;
+            }
+            .link-contrasted-red {
+                color: #00008b;
+            }
+            .link-contrasted-red:hover {
+                color: #0000b5;
+            }
         </style>
     </head>
     <body>
         <nav class="navbar navbar-inverse">
             <div class="container-fluid">
                 <div class="navbar-header">
-                  <span class="navbar-brand"><span class="title-align">Denis Brogniart – Ah !</span></span>
+                    <a class="navbar-brand" href="/"><img src="favicon.ico" alt="Logo"></img> <span class="title-align">Denis Brogniart – Ah !</span></a>
                 </div>
             </div>
         </nav>
         <div class="container well">
-            <div class="alert alert-info" id="loading"></div>
-            <div class="alert alert-danger" id="errorLoading">Une erreur de connexion est survenue lors du chargement des images. Vérifiez votre connexion Internet puis <a href="#" onclick="location.reload();">rechargez la page</a>.</div>
-            <div class="alert alert-danger" id="compa"></div>
-            <p id="description">Le fameux Ah de Denis Brogniart ! Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois que vous voulez sur Denis pour qu'il dise Ah, ou faites le répéter en cliquant sur le bouton prévu pour cela.</p>
+            <div class="alert alert-info" id="loading"><i class="fa fa-refresh fa-spin fa-fw"></i> <span id="loadingInfo"></span></div>
+            <div class="alert alert-danger" id="errorLoading"><i class="fa fa-times-circle" aria-hidden="true"></i> Une erreur de connexion est survenue lors du chargement des images. Vérifiez votre connexion Internet puis <a href="#" onclick="location.reload();" class="link-contrasted-red">rechargez la page</a>.</div>
+            <div class="alert alert-warning" id="compa"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="compaInfo"></span></div>
+            <p id="description">Le fameux Ah de Denis Brogniart (dans l'émission Koh-Lanta) ! Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois que vous voulez sur Denis pour qu'il dise Ah, ou faites le répéter en cliquant sur le bouton prévu pour cela.</p>
             <div class="mb"><img src="" id="ah_img" /></div>
-            <div class="row"><div class="col-sm-2 col-md-2"><ul class="list-group"><li class="list-group-item"><span class="badge" id="nb_ah">0</span> Ah prononcés</li></ul></div></div>
+            <div class="row"><div class="col-sm-3 col-md-3"><ul class="list-group"><li class="list-group-item"><i class="fa fa-comment fa-fw" aria-hidden="true"></i> <span class="badge" id="nb_ah">0</span> Ah prononcés</li></ul></div></div>
             <div class="row">
                 <div class="col-md-4 col-sm-6">
                     <form>
                         <div class="form-group">
-                            <button type="button" class="btn btn-primary" href="#null" onclick="ah_interval();" id="repeat" disabled="disabled">Répéter</button>
-                            <button type="button" class="btn btn-danger" href="#null" onclick="ah_stop();" id="stop" disabled="disabled">Stop</button>
+                            <button type="button" class="btn btn-primary" href="#null" onclick="ah_interval();" id="repeat" disabled="disabled"><i class="fa fa-repeat" aria-hidden="true"></i> Répéter</button>
+                            <button type="button" class="btn btn-danger" href="#null" onclick="ah_stop();" id="stop" disabled="disabled"><i class="fa fa-stop" aria-hidden="true"></i> Stop</button>
                         </div>
                         <div class="form-group" id="formInterval">
-                            <label for="inputInterval">Intervalle de répétition (millisecondes) :</label>
+                            <label for="inputInterval"><i class="fa fa-clock-o" aria-hidden="true"></i> Intervalle de répétition (millisecondes) :</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" id="inputInterval" value="500" placeholder="Entrez l'intervalle (ex : 500 ms)" />
+                                <input type="text" class="form-control" id="inputInterval" value="500" placeholder="Entrez l'intervalle (ex : 500)" />
                                 <span class="input-group-btn">
-                                    <button class="btn btn-default" type="button" id="validInputInterval" onclick="validInterval();">Valider</button>
+                                    <button class="btn btn-default" type="button" id="validInputInterval" onclick="validInterval();"><i class="fa fa-check" aria-hidden="true"></i> Valider</button>
                                 </span>
                             </div>
                         </div>
                         <div class="checkbox disabled" id="checkFullDiv">
-                            <label for="checkFull"><input type="checkbox" id="checkFull" onchange="full()" disabled="disabled" /> Scène entière</label>
+                            <input type="checkbox" id="checkFull" onchange="full()" disabled="disabled" /> <label for="checkFull">Scène entière</label>
                         </div>
                         <div class="checkbox disabled" id="checkSoundDiv">
-                            <label for="checkSound"><input type="checkbox" id="checkSound" onchange="stopSound()" disabled="disabled" /> Couper le son</label>
+                            <input type="checkbox" id="checkSound" onchange="stopSound()" disabled="disabled" /> <label for="checkSound">Couper le son</label>
                         </div>
                     </form>
                 </div>
             </div>
             <p>By <a href="http://www.eliastiksofts.com" target="_blank">Eliastik</a> – <a href="https://github.com/Eliastik/ah" target="_blank">Projet sur Github</a> – <a href="http://www.eliastiksofts.com/ah/downloads/" target="_blank">Télécharger le projet</a> – <a href="README.md" target="_blank">Fichier Lisez-moi</a> – <a href="https://www.youtube.com/watch?v=6oTsleGsWT8" target="_blank">Scène originale en vidéo</a></p>
-            <p class="small">Version 1.0.2 – 24/06/2017</p>
+            <p class="small">Version 1.0.3 – 18/07/2017 – <a href="https://github.com/Eliastik/ah/releases/latest" target="_blank">Journal des changements</a></p>
             <p style="display: none; visibility: hidden;">Ceci est un easter egg. Bravo pour l'avoir trouvé ! Il y en a un autre à trouver (plus bas).</p>
         </div>
         <script type="text/javascript">
@@ -172,7 +215,7 @@
 
             function preloadImages(array) {
                 document.getElementById("loading").style.display = "block";
-                document.getElementById("loading").innerHTML = "Chargement des images : 0/" + array.length;
+                document.getElementById("loadingInfo").innerHTML = "Chargement des images : 0/" + array.length;
                 var loadedImagesCount = 0;
                 var imageNames = array;
                 var imagesArray = [];
@@ -181,7 +224,7 @@
                     image.src = imageNames[i];
                     image.onload = function() {
                         loadedImagesCount++;
-                        document.getElementById("loading").innerHTML = "Chargement des images : "+ loadedImagesCount +"/"+ array.length;
+                        document.getElementById("loadingInfo").innerHTML = "Chargement des images : "+ loadedImagesCount +"/"+ array.length;
 
                         if (loadedImagesCount >= imageNames.length) {
                             preloadAudios(audioArray);
@@ -191,7 +234,7 @@
                         errorLoadingImages = true;
                         loadedImagesCount++;
                         document.getElementById("errorLoading").style.display = "block";
-                        document.getElementById("loading").innerHTML = "Chargement des images : "+ loadedImagesCount +"/"+ array.length;
+                        document.getElementById("loadingInfo").innerHTML = "Chargement des images : "+ loadedImagesCount +"/"+ array.length;
 
                         if (loadedImagesCount >= imageNames.length) {
                             preloadAudios(audioArray);
@@ -206,7 +249,7 @@
                 if (window.HTMLAudioElement) {
                     var audioTestMp3 = document.createElement('audio');
                     if (audioTestMp3.canPlayType && audioTestMp3.canPlayType("audio/mpeg")) {
-                        document.getElementById("loading").innerHTML = "Chargement des sons : 0/"+ array.length;
+                        document.getElementById("loadingInfo").innerHTML = "Chargement des sons : 0/"+ array.length;
                         var loadedAudioCount = 0;
                         var errorLoadingAudio = false;
                         var pourcentageLoadingAudio = 0;
@@ -216,7 +259,7 @@
                             if(audioFilesLoaded.indexOf(this.src) == -1) {
                                 loadedAudioCount++;
                                 var errorLoadingAudio = true;
-                                document.getElementById("loading").innerHTML = "Chargement des sons : "+ loadedAudioCount +"/"+ array.length;
+                                document.getElementById("loadingInfo").innerHTML = "Chargement des sons : "+ loadedAudioCount +"/"+ array.length;
                                 if (loadedAudioCount >= audioFiles.length) {
                                     endInit();
                                 }
@@ -237,7 +280,7 @@
                                     if(audioFilesLoaded.indexOf(this.src) == -1) {
                                         loadedAudioCount++;
                                         var pourcentageLoadingAudio = Math.round((100*loadedAudioCount)/audioFiles.length);
-                                        document.getElementById("loading").innerHTML = "Chargement des sons : "+ loadedAudioCount +"/"+ array.length;
+                                        document.getElementById("loadingInfo").innerHTML = "Chargement des sons : "+ loadedAudioCount +"/"+ array.length;
 
                                         if (loadedAudioCount >= audioFiles.length) {
                                             endInit();
@@ -262,10 +305,10 @@
                 preloadImages(imgArray);
                 if(checkAudio == false) {
                     document.getElementById("compa").style.display = "block";
-                    document.getElementById("compa").innerHTML = "Votre navigateur ne supporte pas la lecture de fichiers audio. Vous n'entendrez pas le Ah de Denis Brogniart !";
+                    document.getElementById("compaInfo").innerHTML = "Votre navigateur ne supporte pas la lecture de fichiers audio. Vous n'entendrez pas le Ah de Denis Brogniart !";
                 } else if(checkAudio == "no mp3 support") {
                     document.getElementById("compa").style.display = "block";
-                    document.getElementById("compa").innerHTML = "Votre navigateur supporte la lecture de fichiers audio, mais il ne peut pas lire le format MP3. Vous n'entendrez pas le Ah de Denis Brogniart !";
+                    document.getElementById("compaInfo").innerHTML = "Votre navigateur supporte la lecture de fichiers audio, mais il ne peut pas lire le format MP3. Vous n'entendrez pas le Ah de Denis Brogniart !";
                 } else {
                     document.getElementById("checkSound").disabled = false;
                     document.getElementById("checkSound").checked = false;
