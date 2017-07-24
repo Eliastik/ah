@@ -6,9 +6,9 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 
 * Version en ligne de ce programme : [www.eliastiksofts.com/ah](http://www.eliastiksofts.com/ah/)
 
-## A propos du programme
+## À propos du programme
 
-* Version du programme : 1.0.3 (18/07/2017)
+* Version du programme : 1.0.4 (24/07/2017)
 * Made in France by Eliastik - [eliastiksofts.com](http://eliastiksofts.com) - Contact : [eliastiksofts.com/contact](http://eliastiksofts.com/contact)
 * Licence : GNU GPLv3 ([https://github.com/Eliastik/ah/blob/master/LICENCE.txt](https://github.com/Eliastik/ah/blob/master/LICENCE.txt))
 * Utilise le thème Bootstrap Cosmo de Bootswatch ([https://bootswatch.com/cosmo/](https://bootswatch.com/cosmo/)), sous licence MIT - ([https://tldrlegal.com/license/mit-license](https://tldrlegal.com/license/mit-license))
@@ -16,6 +16,10 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 * Le Ah de Denis Brogniart vient de cette vidéo : [https://www.youtube.com/watch?v=6oTsleGsWT8](https://www.youtube.com/watch?v=6oTsleGsWT8)
 
 ## Journal des changements
+
+* Version 1.0.4 (24/07/2017) :
+    - Correction de bugs mineurs ;
+    - Ajout d'une section compatibilité dans le fichier README.
 
 * Version 1.0.3 (18/07/2017) :
     - Ajout d'icônes ([Font Awesome](http://fontawesome.io/)) ;
@@ -38,6 +42,19 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 
 * Version 1.0 (12/06/2017) :
     - Version initiale (obviously).
+
+## Compatibilité
+
+Denis Brogniart – Ah ! est compatible avec les navigateurs suivants :
+
+* Chrome, Chromium et autres navigateurs basés sur Chromium (Opera, Vivaldi, etc.) ;
+* Firefox
+* Safari
+
+Les navigateurs suivants sont partiellement compatibles :
+
+* Internet Explorer (l'animation ne se joue qu'une seule fois, cela est dû à la manière dont ce navigateur gère les fichiers GIF ainsi que son système de mise en cache) ;
+* Edge (pareil que pour Internet Explorer).
 
 ## Déclaration de licence
 
