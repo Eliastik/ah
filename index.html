@@ -91,7 +91,7 @@
             <div class="alert alert-danger" id="errorLoading"><i class="fa fa-times-circle" aria-hidden="true"></i> Une erreur de connexion est survenue lors du chargement des images. Vérifiez votre connexion Internet puis <a href="#" onclick="location.reload();" class="link-contrasted-red">rechargez la page</a>.</div>
             <div class="alert alert-warning" id="compa"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="compaInfo"></span></div>
             <p id="description">Le fameux Ah de Denis Brogniart (dans l'émission Koh-Lanta) ! Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois que vous voulez sur Denis pour qu'il dise Ah, ou faites le répéter en cliquant sur le bouton prévu pour cela.</p>
-            <div class="mb"><img src="" id="ah_img" /></div>
+            <div class="mb" id="imgAhDiv"><img src="" id="ah_img" /></div>
             <div class="row"><div class="col-sm-3 col-md-3"><ul class="list-group"><li class="list-group-item"><i class="fa fa-comment fa-fw" aria-hidden="true"></i> <span class="badge" id="nb_ah">0</span> Ah prononcés</li></ul></div></div>
             <div class="row">
                 <div class="col-md-4 col-sm-6">
@@ -207,6 +207,7 @@
                     ah.src = "assets/sounds/ah.mp3";
                 }
                 nb_ah = nb_ah + 1;
+                document.getElementById("ah_img").src = "#";
                 document.getElementById("ah_img").src = img_ah_src;
                 document.getElementById("ah_img").title = "Cliquez ici !";
                 if(checkAudio == true) ah.play();
@@ -328,7 +329,7 @@
             }
 
             // When the page is entirely loaded, calling the init function who load the others assets (images, sounds)
-            document.onreadystatechange = () => {
+            document.onreadystatechange = function() {
                 if (document.readyState === 'complete') {
                     init();
                 }
