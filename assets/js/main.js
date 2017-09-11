@@ -2,6 +2,9 @@
 var nb_ah = 0;
 var timeout = 0;
 var interval = 0;
+var speedAudio = 1;
+var pitchAudio = 1;
+var playFromAPI = false;
 var img_ah_src = "assets/img/ah.gif";
 document.getElementById("checkFull").checked = false;
 var repetitionInterval = 500;
@@ -43,6 +46,64 @@ function stopSound() {
     }
 }
 
+/* https://peteris.rocks/blog/web-audio-api-playback-rate-preserve-pitch/ */
+function playAudioAPI(audio, speed = 1, pitch = 1, rate = 1, BUFFER_SIZE = 1024) {
+    if ('AudioContext' in window) {
+        var st = new SoundTouch(true);
+        st.pitch = pitch;
+        st.tempo = speed;
+        st.rate = rate;
+
+        var context = new AudioContext();
+        var buffer;
+
+        var request = new XMLHttpRequest();
+        request.open('GET', audio, true);
+        request.responseType = 'arraybuffer';
+        request.onload = function() {
+            context.decodeAudioData(request.response, function(data) {
+                buffer = data;
+                node.connect(context.destination);
+
+                var source = {
+                    extract: function (target, numFrames, position) {
+                        var l = buffer.getChannelData(0);
+                        var r = buffer.getChannelData(1);
+                        for (var i = 0; i < numFrames; i++) {
+                            target[i * 2] = l[i + position];
+                            target[i * 2 + 1] = r[i + position];
+                        }
+                        return Math.min(numFrames, l.length - position);
+                    }
+                };
+
+                f = new SimpleFilter(source, st);
+            })
+        }
+
+        request.send();
+
+        var samples = new Float32Array(BUFFER_SIZE * 2);
+        var node = context.createScriptProcessor(BUFFER_SIZE, 2, 2);
+
+        node.onaudioprocess = function (e) {
+            var l = e.outputBuffer.getChannelData(0);
+            var r = e.outputBuffer.getChannelData(1);
+            var framesExtracted = f.extract(samples, BUFFER_SIZE);
+            if (framesExtracted == 0) {
+                node.disconnect();
+            }
+            for (var i = 0; i < framesExtracted; i++) {
+                l[i] = samples[i * 2];
+                r[i] = samples[i * 2 + 1];
+            }
+        };
+    } else {
+        console.error("Web Audio API not supported by this browser.");
+        return false;
+    }
+}
+
 function ah_click() {
     clearTimeout(timeout);
     timeout = setTimeout(ah, 100);
@@ -53,16 +114,36 @@ function ah_interval() {
     ah();
     interval = setInterval(ah, repetitionInterval);
     document.getElementById("formInterval").style.display = "block";
+    document.getElementById("formModify").style.display = "none";
+    playFromAPI = false;
 }
 
 function ah_stop() {
     clearInterval(interval);
     clearTimeout(timeout);
     document.getElementById("formInterval").style.display = "none";
+    document.getElementById("formModify").style.display = "none";
+    playFromAPI = false;
+}
+
+function ah_modify() {
+    clearInterval(interval);
+    clearTimeout(timeout);
+    document.getElementById("formInterval").style.display = "none";
+    document.getElementById("formModify").style.display = "block";
+    playFromAPI = true;
 }
 
 function validInterval() {
-    var tmp_interval = document.getElementById("inputInterval").value;
+    try {
+        var tmp_interval = document.getElementById("inputInterval").value;
+    } catch(e) {
+        alert("Une erreur est survenue");
+        return false;
+    }
+
+    playFromAPI = false;
+
     if(isNaN(tmp_interval) || tmp_interval == "" || tmp_interval <= 10 || tmp_interval > 2147483647) { // max. interval number = 2147483647 ( https://stackoverflow.com/a/39007143 )
         alert("Intervalle invalide !");
         document.getElementById("inputInterval").value = repetitionInterval;
@@ -76,8 +157,39 @@ function validInterval() {
     return false;
 }
 
+function validModify() {
+    try {
+        var tmp_pitch = document.getElementById("pitchRange").value;
+        var tmp_speed = document.getElementById("speedRange").value;
+    } catch(e) {
+        alert("Une erreur est survenue");
+        return false;
+    }
+
+    playFromAPI = true;
+
+    if(isNaN(tmp_pitch) || tmp_pitch == "" || tmp_pitch <= 0 || tmp_pitch > 2) {
+        alert("Valeur du pitch invalide !");
+        document.getElementById("pitchRange").value = pitchAudio;
+        document.getElementById("speedRange").value = speedAudio;
+        return false;
+    } else if(isNaN(tmp_speed) || tmp_speed == "" || tmp_speed <= 0 || tmp_speed > 2) {
+        alert("Valeur de la vitesse invalide !");
+        document.getElementById("pitchRange").value = pitchAudio;
+        document.getElementById("speedRange").value = speedAudio;
+        return false;
+    } else {
+        pitchAudio = tmp_pitch;
+        speedAudio = tmp_speed;
+        ah_click();
+        return true;
+    }
+
+    return false;
+}
+
 function ah() {
-    if(checkAudio == true) {
+    if(checkAudio && playFromAPI == false) {
         var ah = new Audio();
         ah.src = "assets/sounds/ah.mp3";
     }
@@ -85,7 +197,15 @@ function ah() {
     document.getElementById("ah_img").src = "#";
     document.getElementById("ah_img").src = img_ah_src;
     document.getElementById("ah_img").title = "Cliquez ici !";
-    if(checkAudio == true) ah.play();
+    
+    if(checkAudio && !'AudioContext' in window) {
+        ah.play();
+    } else if(checkAudio && 'AudioContext' in window && playFromAPI) {
+        playAudioAPI(audioArray[0], speedAudio, pitchAudio);
+    } else if(checkAudio && playFromAPI == false) {
+        ah.play();
+    }
+    
     document.getElementById("nb_ah").innerHTML = nb_ah;
 }
 
@@ -200,11 +320,11 @@ function endInit() {
     document.getElementById("ah_img").setAttribute("onclick", "ah_click();");
     document.getElementById("ah_img").style.display = "block";
     document.getElementById("loading").style.display = "none";
-    
+
     if ('AudioContext' in window) {
         document.getElementById("modify").disabled = false;
     }
-    
+
     ah_click();
 }
 

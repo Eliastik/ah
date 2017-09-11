@@ -19,11 +19,14 @@
                 max-width: 100%;
                 height: auto;
             }
-            #compa, #errorLoading, #formInterval, #ah_img {
+            #compa, #errorLoading, #formInterval, #ah_img, #formModify {
                 display: none;
             }
             .mb {
                 margin-bottom: 16px;
+            }
+            .mt {
+                margin-top: 16px;
             }
             .small {
                 font-size: 10pt;
@@ -99,7 +102,7 @@
                         <div class="form-group">
                             <button type="button" class="btn btn-primary" href="#null" onclick="ah_interval();" id="repeat" disabled="disabled"><i class="fa fa-repeat fa-fw" aria-hidden="true"></i> Répéter</button>
                             <button type="button" class="btn btn-danger" href="#null" onclick="ah_stop();" id="stop" disabled="disabled"><i class="fa fa-stop fa-fw" aria-hidden="true"></i> Stop</button>
-                            <button type="button" class="btn btn-default" href="#null" id="modify" disabled="disabled"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Modifier la voix</button>
+                            <button type="button" class="btn btn-default" href="#null" onclick="ah_modify();" id="modify" disabled="disabled"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Modifier la voix</button>
                         </div>
                         <div class="row">
                             <div class="col-lg-4 col-sm-6 col-md-6" id="formInterval">
@@ -110,6 +113,23 @@
                                         <span class="input-group-btn">
                                             <button class="btn btn-default" type="button" id="validInputInterval" onclick="validInterval();"><i class="fa fa-check" aria-hidden="true"></i> Valider</button>
                                         </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-sm-6 col-md-6" id="formModify">
+                                <div class="form-group">
+                                    <label for="pitchRange"><i class="fa fa-microphone" aria-hidden="true"></i> Pitch (hauteur de la voix) :</label>
+                                    <div class="input-group">
+                                        <input type="range" id="pitchRange" class="form-control" value="1.0" min="0.1" max="2" step="0.1"></input>
+                                    </div>
+                                    <label for="speedRange"><i class="fa fa-forward" aria-hidden="true"></i> Vitesse :</label>
+                                    <div class="input-group">
+                                        <input type="range" id="speedRange" class="form-control" value="1.0" min="0.1" max="2" step="0.1"></input>
+                                    </div>
+                                    <div class="input-group mt">
+                                        <button class="btn btn-default" type="button" id="validInputModify" onclick="validModify();"><i class="fa fa-check" aria-hidden="true"></i> Valider</button>
                                     </div>
                                 </div>
                             </div>
@@ -127,6 +147,7 @@
             <p class="small">Version 1.0.4 – 24/07/2017 – <a href="https://github.com/Eliastik/ah/releases/latest" target="_blank">Journal des changements</a></p>
             <p style="display: none; visibility: hidden;">Ceci est un easter egg. Bravo pour l'avoir trouvé ! Il y en a un autre à trouver (plus bas).</p>
         </div>
+        <script type="text/javascript" src="assets/js/soundtouch.min.js"></script>
         <script type="text/javascript" src="assets/js/main.js"></script>
     </body>
 </html>

@@ -14,6 +14,7 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 * Utilise le thème Bootstrap Cosmo de Bootswatch ([https://bootswatch.com/cosmo/](https://bootswatch.com/cosmo/)), sous licence MIT - ([https://tldrlegal.com/license/mit-license](https://tldrlegal.com/license/mit-license))
 * Utilise la police d'icônes [Font Awesome](http://fontawesome.io/), sous licence SIL OFL 1.1 ([http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL](http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL)) et MIT ([https://tldrlegal.com/license/mit-license](https://tldrlegal.com/license/mit-license))
 * Le Ah de Denis Brogniart vient de cette vidéo : [https://www.youtube.com/watch?v=6oTsleGsWT8](https://www.youtube.com/watch?v=6oTsleGsWT8)
+* Utilise la bibliothèque logicielle [soundtouch](https://github.com/also/soundtouch-js/) (compressée dans un seul fichier).
 
 ## Journal des changements
 
