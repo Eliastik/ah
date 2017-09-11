@@ -1,4 +1,5 @@
 // Pure JS. No Jquery.
+// Use parts of : https://github.com/urtzurd/html-audio/
 var nb_ah = 0;
 var timeout = 0;
 var interval = 0;
@@ -7,6 +8,9 @@ document.getElementById("checkFull").checked = false;
 var repetitionInterval = 500;
 var imgArray = ['assets/img/ah.gif', 'assets/img/ah_full.gif'];
 var audioArray = ['assets/sounds/ah.mp3'];
+var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+var source, audioContext, pitchShifterProcessor, spectrumAudioAnalyser, sonogramAudioAnalyser;
+var pitchRatio = 1.8, validGranSizes = [256, 512, 1024, 2048, 4096, 8192], grainSize = 8192, overlapRatio = 0.5, spectrumFFTSize = 4096, spectrumSmoothing = 0, sonogramFFTSize = 4096, sonogramSmoothing = 0;
 
 function checkAudio(type) {
     if(!window.HTMLAudioElement) {
@@ -76,8 +80,112 @@ function validInterval() {
     return false;
 }
 
+function initProcessor() {
+    if (pitchShifterProcessor) {
+        pitchShifterProcessor.disconnect();
+    }
+
+    if (audioContext.createScriptProcessor) {
+        pitchShifterProcessor = audioContext.createScriptProcessor(grainSize, 1, 1);
+    } else if (audioContext.createJavaScriptNode) {
+        pitchShifterProcessor = audioContext.createJavaScriptNode(grainSize, 1, 1);
+    }
+
+    pitchShifterProcessor.buffer = new Float32Array(grainSize * 2);
+    pitchShifterProcessor.grainWindow = hannWindow(grainSize);
+    pitchShifterProcessor.onaudioprocess = function (event) {
+
+        var inputData = event.inputBuffer.getChannelData(0);
+        var outputData = event.outputBuffer.getChannelData(0);
+
+        for (i = 0; i < inputData.length; i++) {
+
+            // Apply the window to the input buffer
+            inputData[i] *= this.grainWindow[i];
+
+            // Shift half of the buffer
+            this.buffer[i] = this.buffer[i + grainSize];
+
+            // Empty the buffer tail
+            this.buffer[i + grainSize] = 0.0;
+        }
+
+        // Calculate the pitch shifted grain re-sampling and looping the input
+        var grainData = new Float32Array(grainSize * 2);
+        for (var i = 0, j = 0.0;
+             i < grainSize;
+             i++, j += pitchRatio) {
+
+            var index = Math.floor(j) % grainSize;
+            var a = inputData[index];
+            var b = inputData[(index + 1) % grainSize];
+            grainData[i] += linearInterpolation(a, b, j % 1.0) * this.grainWindow[i];
+        }
+
+        // Copy the grain multiple times overlapping it
+        for (i = 0; i < grainSize; i += Math.round(grainSize * (1 - overlapRatio))) {
+            for (j = 0; j <= grainSize; j++) {
+                this.buffer[i + j] += grainData[j];
+            }
+        }
+
+        // Output the first half of the buffer
+        for (i = 0; i < grainSize; i++) {
+            outputData[i] = this.buffer[i];
+        }
+    };
+
+    pitchShifterProcessor.connect(spectrumAudioAnalyser);
+    pitchShifterProcessor.connect(sonogramAudioAnalyser);
+    pitchShifterProcessor.connect(audioContext.destination);
+}
+
+function initAudio() {
+    spectrumAudioAnalyser = audioContext.createAnalyser();
+    spectrumAudioAnalyser.fftSize = spectrumFFTSize;
+    spectrumAudioAnalyser.smoothingTimeConstant = spectrumSmoothing;
+
+    sonogramAudioAnalyser = audioContext.createAnalyser();
+    sonogramAudioAnalyser.fftSize = sonogramFFTSize;
+    sonogramAudioAnalyser.smoothingTimeConstant = sonogramSmoothing;
+
+    source = audioContext.createBufferSource();
+    initProcessor();
+    var request = new XMLHttpRequest();
+    request.open('GET', audioArray[0], true);
+    request.responseType = 'arraybuffer';
+
+    request.onload = function() {
+        var audioData = request.response;
+
+        audioContext.decodeAudioData(audioData, function(buffer) {
+            source.buffer = buffer;
+                source = audioContext.createBufferSource();
+                source.buffer = buffer;
+                source.loop = false;
+                source.connect(pitchShifterProcessor);
+        });
+    }
+
+    request.send();
+}
+
+function linearInterpolation(a, b, t) {
+    return a + (b - a) * t;
+}
+
+function hannWindow(length) {
+    var window = new Float32Array(length);
+
+    for (var i = 0; i < length; i++) {
+        window[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (length - 1)));
+    }
+
+    return window;
+}
+
 function ah() {
-    if(checkAudio == true) {
+    if(checkAudio == true && !'AudioContext' in window) {
         var ah = new Audio();
         ah.src = "assets/sounds/ah.mp3";
     }
@@ -85,7 +193,7 @@ function ah() {
     document.getElementById("ah_img").src = "#";
     document.getElementById("ah_img").src = img_ah_src;
     document.getElementById("ah_img").title = "Cliquez ici !";
-    if(checkAudio == true) ah.play();
+    if(checkAudio == true && !'AudioContext' in window) ah.play(); else source.start(0);
     document.getElementById("nb_ah").innerHTML = nb_ah;
 }
 
@@ -200,11 +308,12 @@ function endInit() {
     document.getElementById("ah_img").setAttribute("onclick", "ah_click();");
     document.getElementById("ah_img").style.display = "block";
     document.getElementById("loading").style.display = "none";
-    
+
     if ('AudioContext' in window) {
         document.getElementById("modify").disabled = false;
+        initAudio();
     }
-    
+
     ah_click();
 }
 
