@@ -92,21 +92,26 @@
             <div class="alert alert-warning" id="compa"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="compaInfo"></span></div>
             <p id="description">Le fameux Ah de Denis Brogniart (dans l'émission Koh-Lanta) ! Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois que vous voulez sur Denis pour qu'il dise Ah, ou faites le répéter en cliquant sur le bouton prévu pour cela.</p>
             <div class="mb" id="imgAhDiv"><img src="" id="ah_img" /></div>
-            <div class="row"><div class="col-sm-3 col-md-3"><ul class="list-group"><li class="list-group-item"><i class="fa fa-comment fa-fw" aria-hidden="true"></i> <span class="badge" id="nb_ah">0</span> Ah prononcés</li></ul></div></div>
+            <div class="row"><div class="col-lg-3 col-sm-3 col-md-3"><ul class="list-group"><li class="list-group-item"><i class="fa fa-comment fa-fw" aria-hidden="true"></i> <span class="badge" id="nb_ah">0</span> Ah prononcés</li></ul></div></div>
             <div class="row">
-                <div class="col-md-4 col-sm-6">
+                <div class="container-fluid">
                     <form>
                         <div class="form-group">
-                            <button type="button" class="btn btn-primary" href="#null" onclick="ah_interval();" id="repeat" disabled="disabled"><i class="fa fa-repeat" aria-hidden="true"></i> Répéter</button>
-                            <button type="button" class="btn btn-danger" href="#null" onclick="ah_stop();" id="stop" disabled="disabled"><i class="fa fa-stop" aria-hidden="true"></i> Stop</button>
+                            <button type="button" class="btn btn-primary" href="#null" onclick="ah_interval();" id="repeat" disabled="disabled"><i class="fa fa-repeat fa-fw" aria-hidden="true"></i> Répéter</button>
+                            <button type="button" class="btn btn-danger" href="#null" onclick="ah_stop();" id="stop" disabled="disabled"><i class="fa fa-stop fa-fw" aria-hidden="true"></i> Stop</button>
+                            <button type="button" class="btn btn-default" href="#null" id="modify" disabled="disabled"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Modifier la voix</button>
                         </div>
-                        <div class="form-group" id="formInterval">
-                            <label for="inputInterval"><i class="fa fa-clock-o" aria-hidden="true"></i> Intervalle de répétition (millisecondes) :</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="inputInterval" value="500" placeholder="Entrez l'intervalle (ex : 500)" />
-                                <span class="input-group-btn">
-                                    <button class="btn btn-default" type="button" id="validInputInterval" onclick="validInterval();"><i class="fa fa-check" aria-hidden="true"></i> Valider</button>
-                                </span>
+                        <div class="row">
+                            <div class="col-lg-4 col-sm-6 col-md-6" id="formInterval">
+                                <div class="form-group">
+                                    <label for="inputInterval"><i class="fa fa-clock-o" aria-hidden="true"></i> Intervalle de répétition (millisecondes) :</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="inputInterval" value="500" placeholder="Entrez l'intervalle (ex : 500)" />
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button" id="validInputInterval" onclick="validInterval();"><i class="fa fa-check" aria-hidden="true"></i> Valider</button>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="checkbox disabled" id="checkFullDiv">

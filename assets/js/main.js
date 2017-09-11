@@ -80,8 +80,6 @@ function ah() {
     if(checkAudio == true) {
         var ah = new Audio();
         ah.src = "assets/sounds/ah.mp3";
-        ah.playbackRate = 0.5;
-        ah.webkitPreservesPitch = false;
     }
     nb_ah = nb_ah + 1;
     document.getElementById("ah_img").src = "#";
@@ -202,6 +200,11 @@ function endInit() {
     document.getElementById("ah_img").setAttribute("onclick", "ah_click();");
     document.getElementById("ah_img").style.display = "block";
     document.getElementById("loading").style.display = "none";
+    
+    if ('AudioContext' in window) {
+        document.getElementById("modify").disabled = false;
+    }
+    
     ah_click();
 }
 
