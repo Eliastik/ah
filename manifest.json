@@ -14,7 +14,7 @@
     {
       "src": "assets/img/favicon.png",
       "type": "image/png",
-      "sizes": "193x193"
+      "sizes": "192x192"
     }
   ],
   "start_url": "index.html?launcher=true"

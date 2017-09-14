@@ -10,6 +10,7 @@ document.getElementById("checkFull").checked = false;
 var repetitionInterval = 500;
 var imgArray = ['assets/img/ah.gif', 'assets/img/ah_full.gif'];
 var audioArray = ['assets/sounds/ah.mp3'];
+var context = new AudioContext();
 
 var slider = new Slider('#pitchRange', {
     formatter: function(value) {
@@ -65,36 +66,7 @@ function playAudioAPI(audio, speed = 1, pitch = 1, rate = 1, BUFFER_SIZE = 1024)
         st.pitch = pitch;
         st.tempo = speed;
         st.rate = rate;
-
-        var context = new AudioContext();
-        var buffer;
-
-        var request = new XMLHttpRequest();
-        request.open('GET', audio, true);
-        request.responseType = 'arraybuffer';
-        request.onload = function() {
-            context.decodeAudioData(request.response, function(data) {
-                buffer = data;
-                node.connect(context.destination);
-
-                var source = {
-                    extract: function (target, numFrames, position) {
-                        var l = buffer.getChannelData(0);
-                        var r = buffer.getChannelData(1);
-                        for (var i = 0; i < numFrames; i++) {
-                            target[i * 2] = l[i + position];
-                            target[i * 2 + 1] = r[i + position];
-                        }
-                        return Math.min(numFrames, l.length - position);
-                    }
-                };
-
-                f = new SimpleFilter(source, st);
-            })
-        }
-
-        request.send();
-
+        
         var samples = new Float32Array(BUFFER_SIZE * 2);
         var node = context.createScriptProcessor(BUFFER_SIZE, 2, 2);
 
@@ -110,8 +82,24 @@ function playAudioAPI(audio, speed = 1, pitch = 1, rate = 1, BUFFER_SIZE = 1024)
                 r[i] = samples[i * 2 + 1];
             }
         };
+
+        node.connect(context.destination);
+
+        var source = {
+            extract: function (target, numFrames, position) {
+                var l = audio.getChannelData(0);
+                var r = audio.getChannelData(1);
+                for (var i = 0; i < numFrames; i++) {
+                    target[i * 2] = l[i + position];
+                    target[i * 2 + 1] = r[i + position];
+                }
+                return Math.min(numFrames, l.length - position);
+            }
+        };
+
+        f = new SimpleFilter(source, st);
     } else {
-        console.error("Web Audio API not supported by this browser.");
+        if(typeof(window.console.error) !== 'undefined') console.error("Web Audio API not supported by this browser.");
         return false;
     }
 }
@@ -213,7 +201,7 @@ function ah() {
     if(checkAudio && !'AudioContext' in window) {
         ah.play();
     } else if(checkAudio && 'AudioContext' in window && playFromAPI) {
-        playAudioAPI(audioArray[0], speedAudio, pitchAudio);
+        playAudioAPI(audio_ah_buffer, speedAudio, pitchAudio);
     } else if(checkAudio && playFromAPI == false) {
         ah.play();
     }
@@ -309,8 +297,27 @@ function preloadAudios(array) {
     }
 }
 
+function loadAudioAPI(audio, dest) {
+    if ('AudioContext' in window) {
+        var request = new XMLHttpRequest();
+        request.open('GET', audio, true);
+        request.responseType = 'arraybuffer';
+        request.onload = function() {
+            context.decodeAudioData(request.response, function(data) {
+                window[dest] = data;
+            })
+        }
+
+        request.send();
+    } else {
+        if(typeof(window.console.error) !== 'undefined') console.error("Web Audio API is not supported by this browser.");
+        return false;
+    }
+}
+
 function init() {
     preloadImages(imgArray);
+    loadAudioAPI(audioArray[0], "audio_ah_buffer");
     if(checkAudio == false) {
         document.getElementById("compa").style.display = "block";
         document.getElementById("compaInfo").innerHTML = "Votre navigateur ne supporte pas la lecture de fichiers audio. Vous n'entendrez pas le Ah de Denis Brogniart !";
@@ -344,7 +351,7 @@ function endInit() {
     ah_click();
 }
 
-// When the page is entirely loaded, calling the init function who load the others assets (images, sounds)
+// When the page is entirely loaded, call the init function who load the others assets (images, sounds)
 document.onreadystatechange = function() {
     if (document.readyState === 'complete') {
         init();
