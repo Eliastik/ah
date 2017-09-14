@@ -15,6 +15,7 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 * Utilise la police d'icônes [Font Awesome](http://fontawesome.io/), sous [licence SIL OFL 1.1](http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL) et [MIT](https://tldrlegal.com/license/mit-license)
 * Utilise la bibliothèque logicielle [Soundtouch](https://github.com/also/soundtouch-js/) sous [licence GNU LGPL 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.fr.html) (compressée dans un seul fichier).
 * Utilise la bibliothèque logicielle [Boostrap Slider](https://github.com/seiyria/bootstrap-slider) en version 9.8.1, sous [licence MIT](https://github.com/seiyria/bootstrap-slider/blob/master/LICENSE.md)
+* Utilise la bibliothèque logicielle [Boostrap Native](https://github.com/thednp/bootstrap.native), sous [licence MIT](https://github.com/thednp/bootstrap.native/blob/master/LICENSE)
 * Utilise un fichier audio [Impulse Response](https://fr.wikipedia.org/wiki/R%C3%A9ponse_impulsionnelle) (utilisé par la fonction Réverbération) [venant d'ici](http://www.openairlib.net/auralizationdb/content/abernyte-grain-silo) (auteur : Nick Green), sous [licence CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/)
 * Le Ah de Denis Brogniart vient de cette vidéo : [https://www.youtube.com/watch?v=6oTsleGsWT8](https://www.youtube.com/watch?v=6oTsleGsWT8)
 
@@ -48,7 +49,7 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 
 ## Compatibilité
 
-Denis Brogniart – Ah ! est compatible avec les navigateurs suivants :
+Denis Brogniart – Ah ! est compatible avec les navigateurs suivants (versions mobiles comprises) :
 
 * Chrome, Chromium et autres navigateurs basés sur Chromium (Opera, Vivaldi, etc.) ;
 * Firefox
@@ -58,6 +59,8 @@ Les navigateurs suivants sont partiellement compatibles :
 
 * Internet Explorer (l'animation ne se joue qu'une seule fois, cela est dû à la manière dont ce navigateur gère les fichiers GIF ainsi que son système de mise en cache) ;
 * Edge (pareil que pour Internet Explorer).
+
+Pour pouvoir utiliser la fonction « Modifier la voix », il vous faut un navigateur relativement récent (les dernières versions des navigateurs ci-dessus sont usuellement compatibles avec cette fonction).
 
 ## Déclaration de licence
 
