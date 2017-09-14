@@ -65,7 +65,7 @@ Denis Brogniart – Ah ! est compatible avec les navigateurs suivants (versions 
 
 Les navigateurs suivants sont partiellement compatibles :
 
-* Internet Explorer (l'animation ne se joue qu'une seule fois, cela est dû à la manière dont ce navigateur gère les fichiers GIF ainsi que son système de mise en cache) ;
+* Internet Explorer 9 et plus (l'animation ne se joue qu'une seule fois, cela est dû à la manière dont ce navigateur gère les fichiers GIF ainsi que son système de mise en cache) ;
 * Edge (pareil que pour Internet Explorer).
 
 Pour pouvoir utiliser la fonction « Modifier la voix », il vous faut un navigateur relativement récent (les dernières versions des navigateurs ci-dessus sont usuellement compatibles avec cette fonction).
