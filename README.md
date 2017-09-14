@@ -2,13 +2,13 @@
 
 Le fameux Ah de Denis Brogniart, directement sur votre navigateur web !
 
-Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois que vous voulez sur Denis pour qu'il dise Ah, ou faites le répéter en cliquant sur le bouton prévu pour cela.
+Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois que vous voulez sur Denis pour qu'il dise Ah, ou faites le répéter en cliquant sur le bouton prévu pour cela. Vous pouvez aussi modifier sa voix !
 
 * Version en ligne de ce programme : [www.eliastiksofts.com/ah](http://www.eliastiksofts.com/ah/)
 
 ## À propos du programme
 
-* Version du programme : 1.0.4 (24/07/2017)
+* Version du programme : 2.0 (14/09/2017)
 * Made in France by Eliastik - [eliastiksofts.com](http://eliastiksofts.com) - Contact : [eliastiksofts.com/contact](http://eliastiksofts.com/contact)
 * Licence : GNU GPLv3 ([https://github.com/Eliastik/ah/blob/master/LICENCE.txt](https://github.com/Eliastik/ah/blob/master/LICENCE.txt))
 * Utilise le thème Bootstrap Cosmo de Bootswatch ([https://bootswatch.com/cosmo/](https://bootswatch.com/cosmo/)), sous [licence MIT](https://tldrlegal.com/license/mit-license)
@@ -20,6 +20,14 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 * Le Ah de Denis Brogniart vient de cette vidéo : [https://www.youtube.com/watch?v=6oTsleGsWT8](https://www.youtube.com/watch?v=6oTsleGsWT8)
 
 ## Journal des changements
+
+* Version 2.0 (14/09/2017) :
+    - Possibilité de modifier la voix ! Différentes options sont disponibles : augmenter ou baisser la hauteur de la voix (effet chipmunk), la vitesse ou d'ajouter un effet de réverbération (fonctionne grâce à l'API Web Audio) ;
+    - Ajout de la liste des navigateurs compatibles directement dans le programme ;
+    - Modification de l'icône ;
+    - Améliorations diverses :
+        - Mise en page corrigée et améliorée ;
+        - Déplacement du script Javascript et du style CSS principaux dans un fichier séparé du code HTML.
 
 * Version 1.0.4 (24/07/2017) :
     - Correction de bugs mineurs ;
