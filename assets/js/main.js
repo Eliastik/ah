@@ -4,12 +4,13 @@ var timeout = 0;
 var interval = 0;
 var speedAudio = 1;
 var pitchAudio = 1;
+var reverbAudio = false;
 var playFromAPI = false;
 var img_ah_src = "assets/img/ah.gif";
 document.getElementById("checkFull").checked = false;
 var repetitionInterval = 500;
 var imgArray = ['assets/img/ah.gif', 'assets/img/ah_full.gif'];
-var audioArray = ['assets/sounds/ah.mp3'];
+var audioArray = ['assets/sounds/ah.mp3', 'assets/sounds/impulse_response.mp3'];
 var context = new AudioContext();
 
 var slider = new Slider('#pitchRange', {
@@ -60,12 +61,14 @@ function stopSound() {
 }
 
 /* https://peteris.rocks/blog/web-audio-api-playback-rate-preserve-pitch/ */
-function playAudioAPI(audio, speed = 1, pitch = 1, rate = 1, BUFFER_SIZE = 1024) {
+function playAudioAPI(audio, speed = 1, pitch = 1, reverb = false, rate = 1, BUFFER_SIZE = 1024) {
     if ('AudioContext' in window) {
         var st = new SoundTouch(true);
         st.pitch = pitch;
         st.tempo = speed;
         st.rate = rate;
+        
+        if(reverb) var convolver = context.createConvolver();
         
         var samples = new Float32Array(BUFFER_SIZE * 2);
         var node = context.createScriptProcessor(BUFFER_SIZE, 2, 2);
@@ -82,8 +85,14 @@ function playAudioAPI(audio, speed = 1, pitch = 1, rate = 1, BUFFER_SIZE = 1024)
                 r[i] = samples[i * 2 + 1];
             }
         };
-
-        node.connect(context.destination);
+        
+        if(reverb) {
+            convolver.buffer = audio_impulse_response;
+            node.connect(convolver);
+            convolver.connect(context.destination);
+        } else {
+            node.connect(context.destination);
+        }
 
         var source = {
             extract: function (target, numFrames, position) {
@@ -181,6 +190,7 @@ function validModify() {
     } else {
         pitchAudio = tmp_pitch;
         speedAudio = tmp_speed;
+        if(document.getElementById("checkReverb").checked == true) reverbAudio = true; else reverbAudio = false;
         ah_click();
         return true;
     }
@@ -201,7 +211,7 @@ function ah() {
     if(checkAudio && !'AudioContext' in window) {
         ah.play();
     } else if(checkAudio && 'AudioContext' in window && playFromAPI) {
-        playAudioAPI(audio_ah_buffer, speedAudio, pitchAudio);
+        playAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio);
     } else if(checkAudio && playFromAPI == false) {
         ah.play();
     }
@@ -318,6 +328,7 @@ function loadAudioAPI(audio, dest) {
 function init() {
     preloadImages(imgArray);
     loadAudioAPI(audioArray[0], "audio_ah_buffer");
+    loadAudioAPI(audioArray[1], "audio_impulse_response");
     if(checkAudio == false) {
         document.getElementById("compa").style.display = "block";
         document.getElementById("compaInfo").innerHTML = "Votre navigateur ne supporte pas la lecture de fichiers audio. Vous n'entendrez pas le Ah de Denis Brogniart !";
