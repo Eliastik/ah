@@ -11,6 +11,18 @@ var repetitionInterval = 500;
 var imgArray = ['assets/img/ah.gif', 'assets/img/ah_full.gif'];
 var audioArray = ['assets/sounds/ah.mp3'];
 
+var slider = new Slider('#pitchRange', {
+    formatter: function(value) {
+        return value;
+    }
+});
+
+var slider2 = new Slider('#speedRange', {
+    formatter: function(value) {
+        return value;
+    }
+});
+
 function checkAudio(type) {
     if(!window.HTMLAudioElement) {
         return false;
@@ -197,7 +209,7 @@ function ah() {
     document.getElementById("ah_img").src = "#";
     document.getElementById("ah_img").src = img_ah_src;
     document.getElementById("ah_img").title = "Cliquez ici !";
-    
+
     if(checkAudio && !'AudioContext' in window) {
         ah.play();
     } else if(checkAudio && 'AudioContext' in window && playFromAPI) {
@@ -205,7 +217,7 @@ function ah() {
     } else if(checkAudio && playFromAPI == false) {
         ah.play();
     }
-    
+
     document.getElementById("nb_ah").innerHTML = nb_ah;
 }
 
@@ -323,6 +335,10 @@ function endInit() {
 
     if ('AudioContext' in window) {
         document.getElementById("modify").disabled = false;
+        document.getElementById("modify").setAttribute("title", "");
+    } else {
+        document.getElementById("modify").disabled = true;
+        document.getElementById("modify").setAttribute("title", "Désolé, votre navigateur est incompatible avec cette fonction.");
     }
 
     ah_click();

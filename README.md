@@ -11,10 +11,11 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 * Version du programme : 1.0.4 (24/07/2017)
 * Made in France by Eliastik - [eliastiksofts.com](http://eliastiksofts.com) - Contact : [eliastiksofts.com/contact](http://eliastiksofts.com/contact)
 * Licence : GNU GPLv3 ([https://github.com/Eliastik/ah/blob/master/LICENCE.txt](https://github.com/Eliastik/ah/blob/master/LICENCE.txt))
-* Utilise le thème Bootstrap Cosmo de Bootswatch ([https://bootswatch.com/cosmo/](https://bootswatch.com/cosmo/)), sous licence MIT - ([https://tldrlegal.com/license/mit-license](https://tldrlegal.com/license/mit-license))
-* Utilise la police d'icônes [Font Awesome](http://fontawesome.io/), sous licence SIL OFL 1.1 ([http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL](http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL)) et MIT ([https://tldrlegal.com/license/mit-license](https://tldrlegal.com/license/mit-license))
+* Utilise le thème Bootstrap Cosmo de Bootswatch ([https://bootswatch.com/cosmo/](https://bootswatch.com/cosmo/)), sous licence [MIT](https://tldrlegal.com/license/mit-license)
+* Utilise la police d'icônes [Font Awesome](http://fontawesome.io/), sous [licence SIL OFL 1.1](http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL) et [MIT](https://tldrlegal.com/license/mit-license)
+* Utilise la bibliothèque logicielle [Soundtouch](https://github.com/also/soundtouch-js/) sous licence [GNU LGPL 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.fr.html) (compressée dans un seul fichier).
+* Utilise la bibliothèque logicielle [Boostrap Slider](https://github.com/seiyria/bootstrap-slider) en version 9.8.1, sous licence [MIT](https://github.com/seiyria/bootstrap-slider/blob/master/LICENSE.md)
 * Le Ah de Denis Brogniart vient de cette vidéo : [https://www.youtube.com/watch?v=6oTsleGsWT8](https://www.youtube.com/watch?v=6oTsleGsWT8)
-* Utilise la bibliothèque logicielle [soundtouch](https://github.com/also/soundtouch-js/) (compressée dans un seul fichier).
 
 ## Journal des changements
 
