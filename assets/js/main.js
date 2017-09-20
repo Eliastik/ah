@@ -11,7 +11,7 @@ document.getElementById("checkFull").checked = false;
 var repetitionInterval = 500;
 var imgArray = ['assets/img/ah.gif', 'assets/img/ah_full.gif'];
 var audioArray = ['assets/sounds/ah.mp3', 'assets/sounds/impulse_response.mp3'];
-var context = new AudioContext();
+if('AudioContext' in window) var context = new AudioContext(); var offlineContext = new OfflineAudioContext(2, 44100*40, 44100);
 
 var slider = new Slider('#pitchRange', {
     formatter: function(value) {
@@ -61,17 +61,17 @@ function stopSound() {
 }
 
 /* https://peteris.rocks/blog/web-audio-api-playback-rate-preserve-pitch/ */
-function playAudioAPI(audio, speed = 1, pitch = 1, reverb = false, rate = 1, BUFFER_SIZE = 1024) {
+function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = false, play = true, audioName = "sample", rate = 1, BUFFER_SIZE = 2048) {
     if ('AudioContext' in window) {
         var st = new SoundTouch(true);
         st.pitch = pitch;
         st.tempo = speed;
         st.rate = rate;
         
-        if(reverb) var convolver = context.createConvolver();
+        if(reverb) var convolver = offlineContext.createConvolver();
         
         var samples = new Float32Array(BUFFER_SIZE * 2);
-        var node = context.createScriptProcessor(BUFFER_SIZE, 2, 2);
+        var node = offlineContext.createScriptProcessor(BUFFER_SIZE, 2, 2);
 
         node.onaudioprocess = function (e) {
             var l = e.outputBuffer.getChannelData(0);
@@ -86,13 +86,36 @@ function playAudioAPI(audio, speed = 1, pitch = 1, reverb = false, rate = 1, BUF
             }
         };
         
-        if(reverb) {
+        if(reverb && play) {
             convolver.buffer = audio_impulse_response;
             node.connect(convolver);
             convolver.connect(context.destination);
-        } else {
+        } else if(play) {
             node.connect(context.destination);
         }
+        
+        context.oncomplete = function(e) {
+          var audioBuffer = e.renderedBuffer;
+          
+          if(save) {
+            recorder && recorder.record();
+            
+            setTimeout(function() {
+                recorder && recorder.stop();
+            
+                recorder && recorder.exportWAV(function(blob) {
+                    var a = document.createElement("a");
+                    var url = URL.createObjectURL(blob);
+                    document.body.appendChild(a);
+                    a.style = "display: none";
+                    a.href = url;
+                    a.download = 'ah-' + new Date().toISOString() + '.wav';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                });
+            }, duration);
+        }
+        };
 
         var source = {
             extract: function (target, numFrames, position) {
@@ -113,9 +136,30 @@ function playAudioAPI(audio, speed = 1, pitch = 1, reverb = false, rate = 1, BUF
     }
 }
 
+function playBufferAudioAPI(buffer) {
+    buffer.connect(context.destination);
+}
+
+function save(audio) {
+    validModify();
+    
+    nb_ah = nb_ah + 1;
+    document.getElementById("ah_img").src = "#";
+    document.getElementById("ah_img").src = img_ah_src;
+    document.getElementById("ah_img").title = "Cliquez ici !";
+    
+    if(checkAudio && 'AudioContext' in window && playFromAPI) {
+        playAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio, true, true);
+    } else {
+        playAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio, true, false);
+    }
+
+    document.getElementById("nb_ah").innerHTML = nb_ah;
+}
+
 function ah_click() {
     clearTimeout(timeout);
-    timeout = setTimeout(ah, 100);
+    timeout = setTimeout(ah, 50);
 }
 
 function ah_interval() {
@@ -201,7 +245,7 @@ function validModify() {
 function ah() {
     if(checkAudio && playFromAPI == false) {
         var ah = new Audio();
-        ah.src = "assets/sounds/ah.mp3";
+        ah.src = audioArray[0];
     }
     nb_ah = nb_ah + 1;
     document.getElementById("ah_img").src = "#";
