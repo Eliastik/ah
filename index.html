@@ -65,9 +65,9 @@
                                         <input type="checkbox" id="checkReverb" /> <label for="checkReverb">Réverbération</label>
                                     </div>
                                     <div class="input-group mt">
-                                        <button class="btn btn-primary" type="button" id="validInputModify" onclick="validModify();"><i class="fa fa-check" aria-hidden="true"></i> Valider</button>
+                                        <button class="btn btn-primary" type="button" id="validInputModify" onclick="validModify(true, false);"><i class="fa fa-check" aria-hidden="true"></i> Valider</button>
                                         &nbsp;
-                                        <button class="btn btn-default" type="button" id="saveInputModify" onclick="save(audio_ah_buffer);"><i class="fa fa-save" aria-hidden="true"></i> Sauvegarder</button>
+                                        <button class="btn btn-default" type="button" id="saveInputModify" onclick="validModify(false, true);" disabled="disabled"><i class="fa fa-save" aria-hidden="true"></i> Sauvegarder</button>
                                     </div>
                                 </div>
                             </div>
@@ -114,7 +114,6 @@
           </div>
         </div>
         <script type="text/javascript" src="assets/js/soundtouch.min.js"></script>
-        <script type="text/javascript" src="assets/js/recorder.js"></script>
         <script type="text/javascript" src="assets/js/bootstrap-slider.min.js"></script>
         <script type="text/javascript" src="assets/js/bootstrap-native.min.js"></script>
         <script type="text/javascript" src="assets/js/main.js"></script>
