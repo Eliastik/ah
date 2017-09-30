@@ -11,7 +11,10 @@ document.getElementById("checkFull").checked = false;
 var repetitionInterval = 500;
 var imgArray = ['assets/img/ah.gif', 'assets/img/ah_full.gif'];
 var audioArray = ['assets/sounds/ah.mp3', 'assets/sounds/impulse_response.mp3'];
-if('AudioContext' in window) var context = new AudioContext();
+if('AudioContext' in window) {
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+    var context = new AudioContext();
+}
 var modifyFirstClick = true;
 
 var slider = new Slider('#pitchRange', {
@@ -62,37 +65,18 @@ function stopSound() {
     }
 }
 
-/* Original, modifié : https://peteris.rocks/blog/web-audio-api-playback-rate-preserve-pitch/ */
+// https://github.com/also/soundtouch-js/issues/2
 function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = false, play = false, audioName = "sample", rate = 1, BUFFER_SIZE = 2048) {
     if ('AudioContext' in window) {
-        if(reverb) {
-            var offlineContext = new OfflineAudioContext(2, 48000*20, 48000);
-        } else {
-            var offlineContext = new OfflineAudioContext(2, 48000*20, 48000);
-        }
-
-        var st = new SoundTouch(true);
+        var offlineContext = new OfflineAudioContext(2, 48000*15, 48000);
+        if(reverb) var convolver = offlineContext.createConvolver();
+        
+        var st = new soundtouch.SoundTouch(48000);
         st.pitch = pitch;
         st.tempo = speed;
         st.rate = rate;
-
-        if(reverb) var convolver = offlineContext.createConvolver();
-
-        var samples = new Float32Array(BUFFER_SIZE * 2);
-        var node = offlineContext.createScriptProcessor(BUFFER_SIZE, 2, 2);
-
-        node.onaudioprocess = function (e) {
-            var l = e.outputBuffer.getChannelData(0);
-            var r = e.outputBuffer.getChannelData(1);
-            var framesExtracted = f.extract(samples, BUFFER_SIZE);
-            if (framesExtracted == 0) {
-                node.disconnect();
-            }
-            for (var i = 0; i < framesExtracted; i++) {
-                l[i] = samples[i * 2];
-                r[i] = samples[i * 2 + 1];
-            }
-        };
+        var filter = new soundtouch.SimpleFilter(new soundtouch.WebAudioBufferSource(audio), st);
+        var node = soundtouch.getWebAudioNode(offlineContext, filter);
 
         if(reverb) {
             convolver.buffer = audio_impulse_response;
@@ -101,9 +85,10 @@ function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = fals
         } else {
             node.connect(offlineContext.destination);
         }
-
+        
         offlineContext.oncomplete = function(e) {
             window[audioName] = e.renderedBuffer;
+            
             document.getElementById("validInputModify").disabled = false;
             if (typeof(Worker) !== "undefined") {
                 document.getElementById("saveInputModify").disabled = false;
@@ -112,6 +97,7 @@ function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = fals
                 document.getElementById("saveInputModify").disabled = true;
                 document.getElementById("saveInputModify").setAttribute("title", "Désolé, votre navigateur est incompatible avec cette fonction.");
             }
+            
             document.getElementById("modify").disabled = false;
 
             if(play) {
@@ -122,20 +108,7 @@ function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = fals
                 saveBuffer(e.renderedBuffer);
             }
         };
-
-        var source = {
-            extract: function (target, numFrames, position) {
-                var l = audio.getChannelData(0);
-                var r = audio.getChannelData(1);
-                for (var i = 0; i < numFrames; i++) {
-                    target[i * 2] = l[i + position];
-                    target[i * 2 + 1] = r[i + position];
-                }
-                return Math.min(numFrames, l.length - position);
-            }
-        };
-
-        f = new SimpleFilter(source, st);
+        
         offlineContext.startRendering();
     } else {
         if(typeof(window.console.error) !== 'undefined') console.error("Web Audio API not supported by this browser.");
@@ -144,10 +117,15 @@ function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = fals
 }
 
 function playBufferAudioAPI(buffer) {
-    var source = context.createBufferSource();
-    source.buffer = buffer;
-    source.connect(context.destination);
-    source.start(0);
+    if ('AudioContext' in window) {
+        var source = context.createBufferSource();
+        source.buffer = buffer;
+        source.start(0);
+        source.connect(context.destination);
+    } else {
+        if(typeof(window.console.error) !== 'undefined') console.error("Web Audio API not supported by this browser.");
+        return false;
+    }
 }
 
 /* https://stackoverflow.com/questions/22560413/html5-web-audio-convert-audio-buffer-into-wav-file */
@@ -155,42 +133,47 @@ function saveBuffer(buffer) {
     if (typeof(Worker) !== "undefined") {
         var worker = new Worker('assets/js/recorderWorker.js');
     } else {
-        if(typeof(window.console.error) !== 'undefined') console.error("Web Audio API is not supported by this browser.");
+        if(typeof(window.console.error) !== 'undefined') console.error("Workers are not supported by this browser.");
         return false;
     }
+    
+    if ('AudioContext' in window) {
+        worker.postMessage({
+            command: 'init',
+            config: {
+                sampleRate: 48000,
+                numChannels: 2
+            }
+        });
 
-    worker.postMessage({
-        command: 'init',
-        config: {
-            sampleRate: 48000,
-            numChannels: 2
-        }
-    });
+        worker.onmessage = function(e) {
+            var blob = e.data;
+            var a = document.createElement("a");
+            var url = URL.createObjectURL(blob);
+            document.body.appendChild(a);
+            a.style = "display: none";
+            a.href = url;
+            a.download = 'ah-' + new Date().toISOString() + '.wav';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
 
-    worker.onmessage = function(e) {
-        var blob = e.data;
-        var a = document.createElement("a");
-        var url = URL.createObjectURL(blob);
-        document.body.appendChild(a);
-        a.style = "display: none";
-        a.href = url;
-        a.download = 'ah-' + new Date().toISOString() + '.wav';
-        a.click();
-        window.URL.revokeObjectURL(url);
-    };
+        worker.postMessage({
+            command: 'record',
+            buffer: [
+                buffer.getChannelData(0),
+                buffer.getChannelData(1)
+            ]
+        });
 
-    worker.postMessage({
-        command: 'record',
-        buffer: [
-            buffer.getChannelData(0),
-            buffer.getChannelData(1)
-        ]
-    });
-
-    worker.postMessage({
-        command: 'exportWAV',
-        type: 'audio/wav'
-    });
+        worker.postMessage({
+            command: 'exportWAV',
+            type: 'audio/wav'
+        });
+    } else {
+        if(typeof(window.console.error) !== 'undefined') console.error("Web Audio API not supported by this browser.");
+        return false;
+    }
 }
 
 function ah_click() {
@@ -400,10 +383,11 @@ function loadAudioAPI(audio, dest) {
         var request = new XMLHttpRequest();
         request.open('GET', audio, true);
         request.responseType = 'arraybuffer';
+        
         request.onload = function() {
             context.decodeAudioData(request.response, function(data) {
                 window[dest] = data;
-            })
+            });
         }
 
         request.send();

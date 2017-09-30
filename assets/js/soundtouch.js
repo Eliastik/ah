@@ -18,357 +18,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-function extend(a,b) {
-    for ( var i in b ) {
-        var g = b.__lookupGetter__(i), s = b.__lookupSetter__(i);
-
-        if ( g || s ) {
-            if ( g )
-                a.__defineGetter__(i, g);
-            if ( s )
-                a.__defineSetter__(i, s);
-         } else
-             a[i] = b[i];
-    }
-    return a;
-}
-
-function testFloatEqual(a, b) {
-    return (a > b ? a - b : b - a) > 1e-10;
-}
-
-function AbstractFifoSamplePipe(createBuffers) {
-    if (createBuffers) {
-        this.inputBuffer = new FifoSampleBuffer();
-        this.outputBuffer = new FifoSampleBuffer();
-    }
-    else {
-        this.inputBuffer = this.outputBuffer = null;
-    }
-}
-
-AbstractFifoSamplePipe.prototype = {
-    get inputBuffer() {
-        return this._inputBuffer;
-    },
-
-    set inputBuffer (inputBuffer) {
-      this._inputBuffer = inputBuffer;
-    },
-
-    get outputBuffer() {
-        return this._outputBuffer;
-    },
-
-    set outputBuffer(outputBuffer) {
-      this._outputBuffer = outputBuffer;
-    },
-
-    clear: function () {
-        this._inputBuffer.clear();
-        this._outputBuffer.clear();
-    }
-};
-
-function RateTransposer(createBuffers) {
-    AbstractFifoSamplePipe.call(this, createBuffers);
-    this._reset();
-    this.rate = 1;
-}
-
-extend(RateTransposer.prototype, AbstractFifoSamplePipe.prototype);
-extend(RateTransposer.prototype, {
-    set rate(rate) {
-        this._rate = rate;
-        // TODO aa filter
-    },
-
-    _reset: function () {
-        this.slopeCount = 0;
-        this.prevSampleL = 0;
-        this.prevSampleR = 0;
-    },
-
-    clone: function () {
-        var result = new RateTransposer();
-        result.rate = this._rate;
-        return result;
-    },
-
-    process: function () {
-        // TODO aa filter
-        var numFrames = this._inputBuffer.frameCount;
-        this._outputBuffer.ensureAdditionalCapacity(numFrames / this._rate + 1);
-        var numFramesOutput = this._transpose(numFrames);
-        this._inputBuffer.receive();
-        this._outputBuffer.put(numFramesOutput);
-    },
-
-    _transpose: function (numFrames) {
-        if (numFrames == 0) {
-            // no work
-            return 0;
-        }
-
-        var src = this._inputBuffer.vector;
-        var srcOffset = this._inputBuffer.startIndex;
-
-        var dest = this._outputBuffer.vector;
-        var destOffset = this._outputBuffer.endIndex;
-
-        var used = 0;
-        var i = 0;
-
-        while(this.slopeCount < 1.0) {
-            dest[destOffset + 2 * i] = (1.0 - this.slopeCount) * this.prevSampleL + this.slopeCount * src[srcOffset];
-            dest[destOffset + 2 * i + 1] = (1.0 - this.slopeCount) * this.prevSampleR + this.slopeCount * src[srcOffset + 1];
-            i++;
-            this.slopeCount += this._rate;
-        }
-
-        this.slopeCount -= 1.0;
-
-        if (numFrames != 1) {
-            out: while (true) {
-                while (this.slopeCount > 1.0) {
-                    this.slopeCount -= 1.0;
-                    used++;
-                    if (used >= numFrames - 1) {
-                        break out;
-                    }
-                }
-
-                var srcIndex = srcOffset + 2 * used;
-                dest[destOffset + 2 * i] = (1.0 - this.slopeCount) * src[srcIndex] + this.slopeCount * src[srcIndex + 2];
-                dest[destOffset + 2 * i + 1] = (1.0 - this.slopeCount) * src[srcIndex + 1] + this.slopeCount * src[srcIndex + 3];
-
-                i++;
-                this.slopeCount += this._rate;
-            }
-        }
-
-        this.prevSampleL = src[srcOffset + 2 * numFrames - 2];
-        this.prevSampleR = src[srcOffset + 2 * numFrames - 1];
-
-        return i;
-    }
-});
-
-function FifoSampleBuffer() {
-    this._vector = new Float32Array();
-    this._position = 0;
-    this._frameCount = 0;
-}
-
-FifoSampleBuffer.prototype = {
-    get vector() {
-        return this._vector;
-    },
-
-    get position() {
-        return this._position;
-    },
-
-    get startIndex() {
-        return this._position * 2;
-    },
-
-    get frameCount() {
-        return this._frameCount;
-    },
-
-    get endIndex() {
-        return (this._position + this._frameCount) * 2;
-    },
-
-    clear: function() {
-        this.receive(frameCount);
-        this.rewind();
-    },
-
-    put: function (numFrames) {
-        this._frameCount += numFrames;
-    },
-
-    putSamples: function (samples, position, numFrames) {
-        position = position || 0;
-        var sourceOffset = position * 2;
-        if (!(numFrames >= 0)) {
-            numFrames = (samples.length - sourceOffset) / 2;
-        }
-        var numSamples = numFrames * 2;
-
-        this.ensureCapacity(numFrames + this._frameCount);
-
-        var destOffset = this.endIndex;
-        this._vector.set(samples.subarray(sourceOffset, sourceOffset + numSamples), destOffset);
-
-        this._frameCount += numFrames;
-    },
-
-    putBuffer: function (buffer, position, numFrames) {
-        position = position || 0;
-        if (!(numFrames >= 0)) {
-            numFrames = buffer.frameCount - position;
-        }
-        this.putSamples(buffer.vector, buffer.position + position, numFrames);
-    },
-
-    receive: function (numFrames) {
-        if (!(numFrames >= 0) || numFrames > this._frameCount) {
-            numFrames = this._frameCount
-        }
-        this._frameCount -= numFrames;
-        this._position += numFrames;
-    },
-
-    receiveSamples: function (output, numFrames) {
-        var numSamples = numFrames * 2;
-        var sourceOffset = this.startIndex;
-        output.set(this._vector.subarray(sourceOffset, sourceOffset + numSamples));
-        this.receive(numFrames);
-    },
-
-    extract: function (output, position, numFrames) {
-        var sourceOffset = this.startIndex + position * 2;
-        var numSamples = numFrames * 2;
-        output.set(this._vector.subarray(sourceOffset, sourceOffset + numSamples));
-    },
-
-    ensureCapacity: function (numFrames) {
-        var minLength = numFrames * 2;
-        if (this._vector.length < minLength) {
-            var newVector = new Float32Array(minLength);
-            newVector.set(this._vector.subarray(this.startIndex, this.endIndex));
-            this._vector = newVector;
-            this._position = 0;
-        }
-        else {
-            this.rewind();
-        }
-    },
-
-    ensureAdditionalCapacity: function (numFrames) {
-        this.ensureCapacity(this.frameCount + numFrames);
-    },
-
-    rewind: function () {
-        if (this._position > 0) {
-            this._vector.set(this._vector.subarray(this.startIndex, this.endIndex));
-            this._position = 0;
-        }
-    }
-};
-
-function FilterSupport(pipe) {
-    this._pipe = pipe;
-}
-
-FilterSupport.prototype = {
-    get pipe() {
-        return this._pipe;
-    },
-
-    get inputBuffer() {
-        return this._pipe.inputBuffer;
-    },
-
-    get outputBuffer() {
-        return this._pipe.outputBuffer;
-    },
-
-    // fillInputBuffer: function(numFrames) {
-    //     throw new Error("fillInputBuffer() not overridden");
-    // },
-
-    fillOutputBuffer: function(numFrames) {
-        while (this.outputBuffer.frameCount < numFrames) {
-            // TODO hardcoded buffer size
-            var numInputFrames = (8192 * 2) - this.inputBuffer.frameCount;
-
-            this.fillInputBuffer(numInputFrames);
-
-            if (this.inputBuffer.frameCount < (8192 * 2)) {
-                break;
-                // TODO flush pipe
-            }
-            this._pipe.process();
-        }
-    },
-
-    clear: function() {
-        this._pipe.clear();
-    }
-};
-
-function SimpleFilter(sourceSound, pipe) {
-    FilterSupport.call(this, pipe);
-    this.sourceSound = sourceSound;
-    this.historyBufferSize = 22050;
-    this._sourcePosition = 0;
-    this.outputBufferPosition = 0;
-    this._position = 0;
-}
-
-extend(SimpleFilter.prototype, FilterSupport.prototype);
-
-extend(SimpleFilter.prototype, {
-    get position() {
-        return this._position;
-    },
-
-    set position(position) {
-        if (position > this._position) {
-            throw new RangeError('New position may not be greater than current position');
-        }
-        var newOutputBufferPosition = this.outputBufferPosition - (this._position - position);
-        if (newOutputBufferPosition < 0) {
-            throw new RangeError('New position falls outside of history buffer');
-        }
-        this.outputBufferPosition = newOutputBufferPosition;
-        this._position = position;
-    },
-
-    get sourcePosition() {
-        return this._sourcePosition;
-    },
-
-    set sourcePosition(sourcePosition) {
-        this.clear();
-        this._sourcePosition = sourcePosition;
-    },
-
-    fillInputBuffer: function(numFrames) {
-        var samples = new Float32Array(numFrames * 2);
-        var numFramesExtracted = this.sourceSound.extract(samples, numFrames, this._sourcePosition);
-        this._sourcePosition += numFramesExtracted;
-        this.inputBuffer.putSamples(samples, 0, numFramesExtracted);
-    },
-
-    extract: function(target, numFrames) {
-        this.fillOutputBuffer(this.outputBufferPosition + numFrames);
-
-        var numFramesExtracted = Math.min(numFrames, this.outputBuffer.frameCount - this.outputBufferPosition);
-        this.outputBuffer.extract(target, this.outputBufferPosition, numFramesExtracted);
-
-        var currentFrames = this.outputBufferPosition + numFramesExtracted;
-        this.outputBufferPosition = Math.min(this.historyBufferSize, currentFrames);
-        this.outputBuffer.receive(Math.max(currentFrames - this.historyBufferSize, 0));
-
-        this._position += numFramesExtracted;
-        return numFramesExtracted;
-    },
-
-    handleSampleData: function(e) {
-        this.extract(e.data, 4096);
-    },
-
-    clear: function() {
-        // TODO yuck
-        FilterSupport.prototype.clear.call(this);
-        this.outputBufferPosition = 0;
-    }
-});
+(function(window) {
 
 /**
 * Giving this value for the sequence length sets automatic parameter value
@@ -452,7 +102,304 @@ var AUTOSEEK_AT_MAX = 15.0;
 var AUTOSEEK_K = ((AUTOSEEK_AT_MAX - AUTOSEEK_AT_MIN) / (AUTOSEQ_TEMPO_TOP - AUTOSEQ_TEMPO_LOW));
 var AUTOSEEK_C = (AUTOSEEK_AT_MIN - (AUTOSEEK_K) * (AUTOSEQ_TEMPO_LOW));
 
-function Stretch(createBuffers) {
+function extend(a,b) {
+    for (var i in b) {
+        var g = b.__lookupGetter__(i),
+            s = b.__lookupSetter__(i);
+        if (g || s) {
+            if (g) {
+                a.__defineGetter__(i, g);
+            }
+            if (s) {
+                a.__defineSetter__(i, s);
+            }
+        }
+        else {
+            a[i] = b[i];
+        }
+    }
+    return a;
+}
+
+function testFloatEqual(a, b) {
+    return (a > b ? a - b : b - a) > 1e-10;
+}
+
+function AbstractFifoSamplePipe(createBuffers) {
+    if (createBuffers) {
+        this.inputBuffer = new FifoSampleBuffer();
+        this.outputBuffer = new FifoSampleBuffer();
+    }
+    else {
+        this.inputBuffer = this.outputBuffer = null;
+    }
+}
+AbstractFifoSamplePipe.prototype = {
+    get inputBuffer() {
+        return this._inputBuffer;
+    },
+    set inputBuffer(inputBuffer) {
+      this._inputBuffer = inputBuffer;
+    },
+    get outputBuffer() {
+        return this._outputBuffer;
+    },
+    set outputBuffer(outputBuffer) {
+      this._outputBuffer = outputBuffer;
+    },
+    clear: function() {
+        this._inputBuffer.clear();
+        this._outputBuffer.clear();
+    }
+};
+
+function RateTransposer(createBuffers) {
+    AbstractFifoSamplePipe.call(this, createBuffers);
+    this._reset();
+    this.rate = 1;
+}
+extend(RateTransposer.prototype, AbstractFifoSamplePipe.prototype);
+extend(RateTransposer.prototype, {
+    set rate(rate) {
+        this._rate = rate;
+        // TODO aa filter
+    },
+    _reset: function() {
+        this.slopeCount = 0;
+        this.prevSampleL = 0;
+        this.prevSampleR = 0;
+    },
+    process: function() {
+        // TODO aa filter
+        var numFrames = this._inputBuffer.frameCount;
+        this._outputBuffer.ensureAdditionalCapacity(numFrames / this._rate + 1);
+        var numFramesOutput = this._transpose(numFrames);
+        this._inputBuffer.receive();
+        this._outputBuffer.put(numFramesOutput);
+    },
+    _transpose: function(numFrames) {
+        if (numFrames === 0) {
+            return 0; // No work.
+        }
+
+        var src = this._inputBuffer.vector;
+        var srcOffset = this._inputBuffer.startIndex;
+
+        var dest = this._outputBuffer.vector;
+        var destOffset = this._outputBuffer.endIndex;
+
+        var used = 0;
+        var i = 0;
+
+        while (this.slopeCount < 1.0) {
+            dest[destOffset + 2 * i] = (1.0 - this.slopeCount) * this.prevSampleL + this.slopeCount * src[srcOffset];
+            dest[destOffset + 2 * i + 1] = (1.0 - this.slopeCount) * this.prevSampleR + this.slopeCount * src[srcOffset + 1];
+            i++;
+            this.slopeCount += this._rate;
+        }
+
+        this.slopeCount -= 1.0;
+
+        if (numFrames != 1) {
+            out: while (true) {
+                while (this.slopeCount > 1.0) {
+                    this.slopeCount -= 1.0;
+                    used++;
+                    if (used >= numFrames - 1) {
+                        break out;
+                    }
+                }
+
+                var srcIndex = srcOffset + 2 * used;
+                dest[destOffset + 2 * i] = (1.0 - this.slopeCount) * src[srcIndex] + this.slopeCount * src[srcIndex + 2];
+                dest[destOffset + 2 * i + 1] = (1.0 - this.slopeCount) * src[srcIndex + 1] + this.slopeCount * src[srcIndex + 3];
+
+                i++;
+                this.slopeCount += this._rate;
+            }
+        }
+
+        this.prevSampleL = src[srcOffset + 2 * numFrames - 2];
+        this.prevSampleR = src[srcOffset + 2 * numFrames - 1];
+
+        return i;
+    }
+});
+
+function FifoSampleBuffer() {
+    this._vector = new Float32Array();
+    this._position = 0;
+    this._frameCount = 0;
+}
+FifoSampleBuffer.prototype = {
+    get vector() {
+        return this._vector;
+    },
+    get position() {
+        return this._position;
+    },
+    get startIndex() {
+        return this._position * 2;
+    },
+    get frameCount() {
+        return this._frameCount;
+    },
+    get endIndex() {
+        return (this._position + this._frameCount) * 2;
+    },
+    clear: function(frameCount) {
+        this.receive(frameCount);
+        this.rewind();
+    },
+    put: function(numFrames) {
+        this._frameCount += numFrames;
+    },
+    putSamples: function(samples, position, numFrames) {
+        position = position || 0;
+        var sourceOffset = position * 2;
+        if (!(numFrames >= 0)) {
+            numFrames = (samples.length - sourceOffset) / 2;
+        }
+        var numSamples = numFrames * 2;
+
+        this.ensureCapacity(numFrames + this._frameCount);
+
+        var destOffset = this.endIndex;
+        this._vector.set(samples.subarray(sourceOffset, sourceOffset + numSamples), destOffset);
+
+        this._frameCount += numFrames;
+    },
+    putBuffer: function(buffer, position, numFrames) {
+        position = position || 0;
+        if (!(numFrames >= 0)) {
+            numFrames = buffer.frameCount - position;
+        }
+        this.putSamples(buffer.vector, buffer.position + position, numFrames);
+    },
+    receive: function(numFrames) {
+        if (!(numFrames >= 0) || numFrames > this._frameCount) {
+            numFrames = this._frameCount;
+        }
+        this._frameCount -= numFrames;
+        this._position += numFrames;
+    },
+    receiveSamples: function(output, numFrames) {
+        var numSamples = numFrames * 2;
+        var sourceOffset = this.startIndex;
+        output.set(this._vector.subarray(sourceOffset, sourceOffset + numSamples));
+        this.receive(numFrames);
+    },
+    extract: function(output, position, numFrames) {
+        var sourceOffset = this.startIndex + position * 2;
+        var numSamples = numFrames * 2;
+        output.set(this._vector.subarray(sourceOffset, sourceOffset + numSamples));
+    },
+    ensureCapacity: function(numFrames) {
+        var minLength = numFrames * 2;
+        if (this._vector.length < minLength) {
+            var newVector = new Float32Array(minLength);
+            newVector.set(this._vector.subarray(this.startIndex, this.endIndex));
+            this._vector = newVector;
+            this._position = 0;
+        }
+        else {
+            this.rewind();
+        }
+    },
+    ensureAdditionalCapacity: function(numFrames) {
+        this.ensureCapacity(this.frameCount + numFrames);
+    },
+    rewind: function() {
+        if (this._position > 0) {
+            this._vector.set(this._vector.subarray(this.startIndex, this.endIndex));
+            this._position = 0;
+        }
+    }
+};
+
+function SimpleFilter(sourceSound, pipe) {
+    this._pipe = pipe;
+    this.sourceSound = sourceSound;
+    this.historyBufferSize = 22050;
+    this._sourcePosition = 0;
+    this.outputBufferPosition = 0;
+    this._position = 0;
+}
+SimpleFilter.prototype = {
+    get pipe() {
+        return this._pipe;
+    },
+    get position() {
+        return this._position;
+    },
+    set position(position) {
+        if (position > this._position) {
+            throw new RangeError('New position may not be greater than current position');
+        }
+        var newOutputBufferPosition = this.outputBufferPosition - (this._position - position);
+        if (newOutputBufferPosition < 0) {
+            throw new RangeError('New position falls outside of history buffer');
+        }
+        this.outputBufferPosition = newOutputBufferPosition;
+        this._position = position;
+    },
+    get sourcePosition() {
+        return this._sourcePosition;
+    },
+    set sourcePosition(sourcePosition) {
+        this.clear();
+        this._sourcePosition = sourcePosition;
+    },
+    get inputBuffer() {
+        return this._pipe.inputBuffer;
+    },
+    get outputBuffer() {
+        return this._pipe.outputBuffer;
+    },
+    fillInputBuffer: function(numFrames) {
+        var samples = new Float32Array(numFrames * 2);
+        var numFramesExtracted = this.sourceSound.extract(samples, numFrames, this._sourcePosition);
+        this._sourcePosition += numFramesExtracted;
+        this.inputBuffer.putSamples(samples, 0, numFramesExtracted);
+    },
+    fillOutputBuffer: function(numFrames) {
+        while (this.outputBuffer.frameCount < numFrames) {
+            // TODO hardcoded buffer size
+            var numInputFrames = (8192 * 2) - this.inputBuffer.frameCount;
+
+            this.fillInputBuffer(numInputFrames);
+
+            if (this.inputBuffer.frameCount < (8192 * 2)) {
+                break;
+                // TODO flush pipe
+            }
+            this._pipe.process();
+        }
+    },
+    extract: function(target, numFrames) {
+        this.fillOutputBuffer(this.outputBufferPosition + numFrames);
+
+        var numFramesExtracted = Math.min(numFrames, this.outputBuffer.frameCount - this.outputBufferPosition);
+        this.outputBuffer.extract(target, this.outputBufferPosition, numFramesExtracted);
+
+        var currentFrames = this.outputBufferPosition + numFramesExtracted;
+        this.outputBufferPosition = Math.min(this.historyBufferSize, currentFrames);
+        this.outputBuffer.receive(Math.max(currentFrames - this.historyBufferSize, 0));
+
+        this._position += numFramesExtracted;
+        return numFramesExtracted;
+    },
+    handleSampleData: function(e) {
+        this.extract(e.data, 4096);
+    },
+    clear: function() {
+        // TODO yuck
+        this._pipe.clear();
+        this.outputBufferPosition = 0;
+    }
+};
+
+function Stretch(createBuffers, sampleRate) {
     AbstractFifoSamplePipe.call(this, createBuffers);
     this.bQuickSeek = true;
     this.bMidBufferDirty = false;
@@ -464,18 +411,15 @@ function Stretch(createBuffers) {
     this.bAutoSeekSetting = true;
 
     this._tempo = 1;
-    this.setParameters(44100, DEFAULT_SEQUENCE_MS, DEFAULT_SEEKWINDOW_MS, DEFAULT_OVERLAP_MS);
+    this.setParameters(sampleRate, DEFAULT_SEQUENCE_MS, DEFAULT_SEEKWINDOW_MS, DEFAULT_OVERLAP_MS);
 }
-
 extend(Stretch.prototype, AbstractFifoSamplePipe.prototype);
-
 extend(Stretch.prototype, {
-    clear: function () {
+    clear: function() {
         AbstractFifoSamplePipe.prototype.clear.call(this);
         this._clearMidBuffer();
     },
-
-    _clearMidBuffer: function () {
+    _clearMidBuffer: function() {
         if (this.bMidBufferDirty) {
             this.bMidBufferDirty = false;
             this.pMidBuffer = null;
@@ -504,7 +448,8 @@ extend(Stretch.prototype, {
         if (aSequenceMS > 0) {
             this.sequenceMs = aSequenceMS;
             this.bAutoSeqSetting = false;
-        } else {
+        }
+        else {
             // zero or below, use automatic setting
             this.bAutoSeqSetting = true;
         }
@@ -512,7 +457,8 @@ extend(Stretch.prototype, {
         if (aSeekWindowMS > 0) {
             this.seekWindowMs = aSeekWindowMS;
             this.bAutoSeekSetting = false;
-        } else {
+        }
+        else {
             // zero or below, use automatic setting
             this.bAutoSeekSetting = true;
         }
@@ -546,16 +492,9 @@ extend(Stretch.prototype, {
         // process another batch of samples
         this.sampleReq = Math.max(intskip + this.overlapLength, this.seekWindowLength) + this.seekLength;
     },
-
-
-    // get tempo() {
-    //   return this._tempo;
-    // },
-
     get inputChunkSize() {
         return this.sampleReq;
     },
-
     get outputChunkSize() {
         return this.overlapLength + Math.max(0, this.seekWindowLength - 2 * this.overlapLength);
     },
@@ -563,7 +502,7 @@ extend(Stretch.prototype, {
     /**
     * Calculates overlapInMsec period length in samples.
     */
-    calculateOverlapLength: function (overlapInMsec) {
+    calculateOverlapLength: function(overlapInMsec) {
         var newOvl;
 
         // TODO assert(overlapInMsec >= 0);
@@ -578,8 +517,7 @@ extend(Stretch.prototype, {
         this.pRefMidBuffer = new Float32Array(this.overlapLength * 2);
         this.pMidBuffer = new Float32Array(this.overlapLength * 2);
     },
-
-    checkLimits: function (x, mi, ma) {
+    checkLimits: function(x, mi, ma) {
         return (x < mi) ? mi : ((x > ma) ? ma : x);
     },
 
@@ -607,7 +545,6 @@ extend(Stretch.prototype, {
         this.seekLength = Math.floor((this.sampleRate * this.seekWindowMs) / 1000);
     },
 
-
     /**
     * Enables/disables the quick position seeking algorithm.
     */
@@ -615,17 +552,10 @@ extend(Stretch.prototype, {
         this.bQuickSeek = enable;
     },
 
-    clone: function () {
-        var result = new Stretch();
-        result.tempo = this.tempo;
-        result.setParameters(this.sampleRate, this.sequenceMs, this.seekWindowMs, this.overlapMs);
-        return result;
-    },
-
     /**
     * Seeks for the optimal overlap-mixing position.
     */
-    seekBestOverlapPosition: function () {
+    seekBestOverlapPosition: function() {
       if (this.bQuickSeek) {
           return this.seekBestOverlapPositionStereoQuick();
       }
@@ -642,13 +572,10 @@ extend(Stretch.prototype, {
     * sample sequences are 'most alike', in terms of the highest cross-correlation
     * value over the overlapping period
     */
-    seekBestOverlapPositionStereo: function () {
-        var bestOffs;
-        var bestCorr
-        var corr;
-        var i;
+    seekBestOverlapPositionStereo: function() {
+        var bestOffs, bestCorr, corr, i;
 
-        // Slopes the amplitudes of the 'midBuffer' samples
+        // Slopes the amplitudes of the 'midBuffer' samples.
         this.precalcCorrReferenceStereo();
 
         bestCorr = Number.MIN_VALUE;
@@ -656,18 +583,17 @@ extend(Stretch.prototype, {
 
         // Scans for the best correlation value by testing each possible position
         // over the permitted range.
-        for (i = 0; i < this.seekLength; i ++) {
+        for (i = 0; i < this.seekLength; i++) {
             // Calculates correlation value for the mixing position corresponding
             // to 'i'
             corr = this.calcCrossCorrStereo(2 * i, this.pRefMidBuffer);
 
-            // Checks for the highest correlation value
+            // Checks for the highest correlation value.
             if (corr > bestCorr) {
                 bestCorr = corr;
                 bestOffs = i;
             }
         }
-
         return bestOffs;
     },
 
@@ -679,14 +605,8 @@ extend(Stretch.prototype, {
     * sample sequences are 'most alike', in terms of the highest cross-correlation
     * value over the overlapping period
     */
-    seekBestOverlapPositionStereoQuick: function () {
-        var j;
-        var bestOffs;
-        var bestCorr;
-        var corr;
-        var scanCount;
-        var corrOffset;
-        var tempOffset;
+    seekBestOverlapPositionStereoQuick: function() {
+        var j, bestOffs, bestCorr, corr, scanCount, corrOffset, tempOffset;
 
         // Slopes the amplitude of the 'midBuffer' samples
         this.precalcCorrReferenceStereo();
@@ -702,11 +622,13 @@ extend(Stretch.prototype, {
         // In first pass the routine searhes for the highest correlation with
         // relatively coarse steps, then rescans the neighbourhood of the highest
         // correlation with better resolution and so on.
-        for (scanCount = 0; scanCount < 4; scanCount ++) {
+        for (scanCount = 0; scanCount < 4; scanCount++) {
             j = 0;
             while (_SCAN_OFFSETS[scanCount][j]) {
                 tempOffset = corrOffset + _SCAN_OFFSETS[scanCount][j];
-                if (tempOffset >= this.seekLength) break;
+                if (tempOffset >= this.seekLength) {
+                    break;
+                }
 
                 // Calculates correlation value for the mixing position corresponding
                 // to 'tempOffset'
@@ -721,7 +643,6 @@ extend(Stretch.prototype, {
             }
             corrOffset = bestOffs;
         }
-
         return bestOffs;
     },
 
@@ -730,11 +651,9 @@ extend(Stretch.prototype, {
     * is faster to calculate
     */
     precalcCorrReferenceStereo: function() {
-        var i;
-        var cnt2;
-        var temp;
+        var i, cnt2, temp;
 
-        for (i = 0; i < this.overlapLength; i ++) {
+        for (i = 0; i < this.overlapLength; i++) {
             temp = i * (this.overlapLength - i);
             cnt2 = i * 2;
             this.pRefMidBuffer[cnt2] = this.pMidBuffer[cnt2] * temp;
@@ -746,17 +665,13 @@ extend(Stretch.prototype, {
         var mixing = this._inputBuffer.vector;
         mixingPos += this._inputBuffer.startIndex;
 
-        var corr;
-        var i;
-        var mixingOffset;
-
+        var corr, i, mixingOffset;
         corr = 0;
         for (i = 2; i < 2 * this.overlapLength; i += 2) {
             mixingOffset = i + mixingPos;
             corr += mixing[mixingOffset] * compare[i] +
             mixing[mixingOffset + 1] * compare[i + 1];
         }
-
         return corr;
     },
 
@@ -765,7 +680,7 @@ extend(Stretch.prototype, {
     * Overlaps samples in 'midBuffer' with the samples in 'pInputBuffer' at position
     * of 'ovlPos'.
     */
-    overlap: function (ovlPos) {
+    overlap: function(ovlPos) {
         this.overlapStereo(2 * ovlPos);
     },
 
@@ -776,19 +691,11 @@ extend(Stretch.prototype, {
         var pInput = this._inputBuffer.vector;
         pInputPos += this._inputBuffer.startIndex;
 
-        var pOutput = this._outputBuffer.vector;
-        var pOutputPos = this._outputBuffer.endIndex;
-
-        var i;
-        var cnt2;
-        var fTemp;
-        var fScale;
-        var fi;
-        var pInputOffset;
-        var pOutputOffset;
+        var pOutput = this._outputBuffer.vector,
+            pOutputPos = this._outputBuffer.endIndex,
+            i, cnt2, fTemp, fScale, fi, pInputOffset, pOutputOffset;
 
         fScale = 1 / this.overlapLength;
-
         for (i = 0; i < this.overlapLength; i++) {
             fTemp = (this.overlapLength - i) * fScale;
             fi = i * fScale;
@@ -799,14 +706,9 @@ extend(Stretch.prototype, {
             pOutput[pOutputOffset + 1] = pInput[pInputOffset + 1] * fi + this.pMidBuffer[cnt2 + 1] * fTemp;
         }
     },
-
     process: function() {
-        var ovlSkip;
-        var offset;
-        var temp;
-        var i;
-
-        if (this.pMidBuffer == null) {
+        var ovlSkip, offset, temp, i;
+        if (this.pMidBuffer === null) {
             // if midBuffer is empty, move the first samples of the input stream
             // into it
             if (this._inputBuffer.frameCount < this.overlapLength) {
@@ -846,7 +748,7 @@ extend(Stretch.prototype, {
             // processing sequence and so on
             //assert(offset + seekWindowLength <= (int)inputBuffer.numSamples());
             var start = this.inputBuffer.startIndex + 2 * (offset + this.seekWindowLength - this.overlapLength);
-            this.pMidBuffer.set(this._inputBuffer.vector.subarray(start, start + 2 * this.overlapLength))
+            this.pMidBuffer.set(this._inputBuffer.vector.subarray(start, start + 2 * this.overlapLength));
 
             // Remove the processed samples from the input buffer. Update
             // the difference between integer & nominal skip step to 'skipFract'
@@ -866,16 +768,16 @@ extend(Stretch.prototype, {
     }
 });
 
-function SoundTouch() {
+function SoundTouch(sampleRate) {
     this.rateTransposer = new RateTransposer(false);
-    this.tdStretch = new Stretch(false);
+    this.tdStretch = new Stretch(false, sampleRate);
 
     this._inputBuffer = new FifoSampleBuffer();
     this._intermediateBuffer = new FifoSampleBuffer();
     this._outputBuffer = new FifoSampleBuffer();
 
     this._rate = 0;
-    this.tempo = 0;
+    this._tempo = 0;
 
     this.virtualPitch = 1.0;
     this.virtualRate = 1.0;
@@ -883,69 +785,49 @@ function SoundTouch() {
 
     this._calculateEffectiveRateAndTempo();
 }
-
-extend(SoundTouch.prototype, {
-    clear: function () {
+SoundTouch.prototype = {
+    clear: function() {
         rateTransposer.clear();
         tdStretch.clear();
     },
-
-    clone: function () {
-        var result = new SoundTouch();
-        result.rate = rate;
-        result.tempo = tempo;
-        return result;
-    },
-
     get rate() {
         return this._rate;
     },
-
     set rate(rate) {
         this.virtualRate = rate;
         this._calculateEffectiveRateAndTempo();
     },
-
     set rateChange(rateChange) {
         this.rate = 1.0 + 0.01 * rateChange;
     },
-
     get tempo() {
         return this._tempo;
     },
-
     set tempo(tempo) {
         this.virtualTempo = tempo;
         this._calculateEffectiveRateAndTempo();
     },
-
     set tempoChange(tempoChange) {
         this.tempo = 1.0 + 0.01 * tempoChange;
     },
-
     set pitch(pitch) {
         this.virtualPitch = pitch;
         this._calculateEffectiveRateAndTempo();
     },
-
     set pitchOctaves(pitchOctaves) {
         this.pitch = Math.exp(0.69314718056 * pitchOctaves);
         this._calculateEffectiveRateAndTempo();
     },
-
     set pitchSemitones(pitchSemitones) {
         this.pitchOctaves = pitchSemitones / 12.0;
     },
-
     get inputBuffer() {
         return this._inputBuffer;
     },
-
     get outputBuffer() {
         return this._outputBuffer;
     },
-
-    _calculateEffectiveRateAndTempo: function () {
+    _calculateEffectiveRateAndTempo: function() {
         var previousTempo = this._tempo;
         var previousRate = this._rate;
 
@@ -978,8 +860,7 @@ extend(SoundTouch.prototype, {
             }
         }
     },
-
-    process: function () {
+    process: function() {
         if (this._rate > 1.0) {
             this.tdStretch.process();
             this.rateTransposer.process();
@@ -989,4 +870,50 @@ extend(SoundTouch.prototype, {
             this.tdStretch.process();
         }
     }
-});
+};
+
+function WebAudioBufferSource(buffer) {
+    this.buffer = buffer;
+}
+WebAudioBufferSource.prototype = {
+    extract: function(target, numFrames, position) {
+        var l = this.buffer.getChannelData(0),
+            r = this.buffer.getChannelData(1);
+        for (var i = 0; i < numFrames; i++) {
+            target[i * 2] = l[i + position];
+            target[i * 2 + 1] = r[i + position];
+        }
+        return Math.min(numFrames, l.length - position);
+    }
+};
+
+function getWebAudioNode(context, filter) {
+    var BUFFER_SIZE = 4096;
+    console.log(context);
+    var node = context.createScriptProcessor(BUFFER_SIZE, 2, 2),
+        samples = new Float32Array(BUFFER_SIZE * 2);
+    node.onaudioprocess = function(e) {
+        var l = e.outputBuffer.getChannelData(0),
+            r = e.outputBuffer.getChannelData(1);
+        var framesExtracted = filter.extract(samples, BUFFER_SIZE);
+        if (framesExtracted === 0) {
+            node.disconnect(); // Pause.
+        }
+        for (var i = 0; i < framesExtracted; i++) {
+            l[i] = samples[i * 2];
+            r[i] = samples[i * 2 + 1];
+        }
+    };
+    return node;
+}
+
+window.soundtouch = {
+    'RateTransposer': RateTransposer,
+    'Stretch': Stretch,
+    'SimpleFilter': SimpleFilter,
+    'SoundTouch': SoundTouch,
+    'WebAudioBufferSource': WebAudioBufferSource,
+    'getWebAudioNode': getWebAudioNode
+};
+
+})(this);
