@@ -294,11 +294,13 @@ function validModify(play = false, save = false) {
         document.getElementById("validInputModify").disabled = true;
         document.getElementById("saveInputModify").disabled = true;
         if(compaAudioAPI) {
-            if(play && checkAudio) {
-                ah_click();
-            } else {
+            if(checkAudio !== true || play !== true) {
                 document.getElementById("modify").disabled = false;
                 document.getElementById("validInputModify").disabled = false;
+            }
+            
+            if(play) {
+                ah_click();
             }
         } else {
             renderAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio, save, play, "audio_ah_processed", compaAudioAPI);
