@@ -7,6 +7,7 @@ var pitchAudio = 1;
 var reverbAudio = false;
 var playFromAPI = false;
 var compaAudioAPI = false;
+var compatModeChecked = false;
 var img_ah_src = "assets/img/ah.gif";
 document.getElementById("checkFull").checked = false;
 var repetitionInterval = 500;
@@ -76,6 +77,10 @@ function compaMode() {
     }
 }
 
+function add(a, b) {
+    return a + b;
+}
+
 function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = false, play = false, audioName = "sample", comp = false, rate = 1, BUFFER_SIZE = 4096) {
     if ('AudioContext' in window) {
         if(!comp) {
@@ -113,6 +118,19 @@ function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = fals
                 } else {
                     document.getElementById("saveInputModify").disabled = true;
                     document.getElementById("saveInputModify").setAttribute("title", "Désolé, votre navigateur est incompatible avec cette fonction.");
+                }
+                
+                if(!compatModeChecked) {
+                    var sum = e.renderedBuffer.getChannelData(0).reduce(add, 0);
+                    
+                    if(sum == 0) {
+                        document.getElementById("checkCompa").checked = true;
+                        compaMode();
+                        document.getElementById("compatAutoDetected").style.display = "block";
+                        compaAudioAPI = true;
+                    }
+                    
+                    compatModeChecked = true;
                 }
 
                 if(play) {

@@ -5,7 +5,7 @@ img {
     max-width: 100%;
     height: auto;
 }
-#compa, #errorLoading, #formInterval, #ah_img, #formModify {
+#compa, #errorLoading, #formInterval, #ah_img, #formModify, #compatAutoDetected {
     display: none;
 }
 .mb {
@@ -13,6 +13,9 @@ img {
 }
 .mt {
     margin-top: 16px;
+}
+.ml {
+    margin-left: 22px;
 }
 .small {
     font-size: 10pt;
