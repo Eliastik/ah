@@ -105,9 +105,8 @@ function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = fals
             offlineContext.oncomplete = function(e) {
                 window[audioName] = e.renderedBuffer;
                 
-                document.getElementById("validInputModify").disabled = false;
                 document.getElementById("modify").disabled = false;
-                
+                document.getElementById("validInputModify").disabled = false;
                 if (typeof(Worker) !== "undefined") {
                     document.getElementById("saveInputModify").disabled = false;
                     document.getElementById("saveInputModify").setAttribute("title", "");
@@ -127,11 +126,11 @@ function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = fals
             
             offlineContext.startRendering();
         } else {
-            document.getElementById("modify").disabled = false;
-            document.getElementById("validInputModify").disabled = false;
             document.getElementById("saveInputModify").disabled = true;
             document.getElementById("saveInputModify").setAttribute("title", "Non disponible en mode de compatibilité.");
-            
+        
+            document.getElementById("modify").disabled = false;
+            document.getElementById("validInputModify").disabled = false;
             if(play && checkAudio && playFromAPI) {
                 if(reverb) {
                     convolver.buffer = audio_impulse_response;
@@ -294,8 +293,13 @@ function validModify(play = false, save = false) {
         if(document.getElementById("checkCompa").checked == true) compaAudioAPI = true; else compaAudioAPI = false;
         document.getElementById("validInputModify").disabled = true;
         document.getElementById("saveInputModify").disabled = true;
-        if(compaAudioAPI && play) {
-            ah_click();
+        if(compaAudioAPI) {
+            if(play && checkAudio) {
+                ah_click();
+            } else {
+                document.getElementById("modify").disabled = false;
+                document.getElementById("validInputModify").disabled = false;
+            }
         } else {
             renderAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio, save, play, "audio_ah_processed", compaAudioAPI);
         }
