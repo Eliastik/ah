@@ -8,7 +8,7 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 
 ## À propos du programme
 
-* Version du programme : 2.0 (14/09/2017)
+* Version du programme : 2.1 (1/10/2017)
 * Made in France by Eliastik - [eliastiksofts.com](http://eliastiksofts.com) - Contact : [eliastiksofts.com/contact](http://eliastiksofts.com/contact)
 * Licence : GNU GPLv3 ([https://github.com/Eliastik/ah/blob/master/LICENCE.txt](https://github.com/Eliastik/ah/blob/master/LICENCE.txt))
 * Utilise le thème Bootstrap Cosmo de Bootswatch ([https://bootswatch.com/cosmo/](https://bootswatch.com/cosmo/)), sous [licence MIT](https://tldrlegal.com/license/mit-license)
@@ -20,6 +20,15 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 * Le Ah de Denis Brogniart vient de cette vidéo : [https://www.youtube.com/watch?v=6oTsleGsWT8](https://www.youtube.com/watch?v=6oTsleGsWT8)
 
 ## Journal des changements
+
+* Version 2.1 (1/10/2017) :
+    - Possibilité d'enregistrer la voix modifiée sous la forme d'un fichier audio au format wav ;
+    - Amélioration des performances de la fonction Modifier la voix, la voix modifiée est mise en cache avant d'être jouée (uniquement lorsque le mode de compatibilité est désactivé) ;
+    - Mode de compatibilité ajouté pour revenir à l'ancien mode de calcul de la fonction Modifier la voix, les navigateurs non compatibles ou ayant un bug sont détectés et ce mode s'active automatiquement. Ce mode ne permet pas d'enregistrer la voix modifiée ;
+    - Corrections de bugs et améliorations diverses :
+        - Correction d'un plantage avec les navigateurs ne supportant pas l'API Web Audio ;
+        - Correction du code d'initialisation ;
+        - Corrections d'autres bugs mineurs et autres ajustements.
 
 * Version 2.0 (14/09/2017) :
     - Possibilité de modifier la voix ! Différentes options sont disponibles : augmenter ou baisser la hauteur de la voix (effet chipmunk), la vitesse ou d'ajouter un effet de réverbération (fonctionne grâce à l'API Web Audio) ;
@@ -68,7 +77,16 @@ Les navigateurs suivants sont partiellement compatibles :
 * Internet Explorer 9 et plus (l'animation ne se joue qu'une seule fois, cela est dû à la manière dont ce navigateur gère les fichiers GIF ainsi que son système de mise en cache) ;
 * Edge (pareil que pour Internet Explorer).
 
-Pour pouvoir utiliser la fonction « Modifier la voix », il vous faut un navigateur relativement récent (les dernières versions des navigateurs ci-dessus sont usuellement compatibles avec cette fonction).
+Pour pouvoir utiliser la fonction &laquo; Modifier la voix &raquo;, il vous faut un navigateur relativement récent (les dernières versions des navigateurs ci-dessus sont usuellement compatibles avec cette fonction, sauf Internet Explorer).
+
+Il n'est pas encore possible d'enregistrer les voix modifiées avec Firefox pour l'instant, à cause d'un [bug de ce navigateur](https://bugzilla.mozilla.org/show_bug.cgi?id=1031851).
+
+## To-do list :
+
+To-do uniquement si possible :
+
+* Effet Vocoder pour la fonction Modifier la voix ;
+* Vérifier la compatibilité avec les futures versions de Firefox (bug).
 
 ## Déclaration de licence
 
