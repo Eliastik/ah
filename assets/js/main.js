@@ -132,21 +132,13 @@ function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = fals
             document.getElementById("saveInputModify").disabled = true;
             document.getElementById("saveInputModify").setAttribute("title", "Non disponible en mode de compatibilité.");
             
-            if(play) {
-                nb_ah = nb_ah + 1;
-                document.getElementById("ah_img").src = "#";
-                document.getElementById("ah_img").src = img_ah_src;
-                document.getElementById("ah_img").title = "Cliquez ici !";
-                document.getElementById("nb_ah").innerHTML = nb_ah;
-                
-                if(checkAudio && playFromAPI) {
-                    if(reverb) {
-                        convolver.buffer = audio_impulse_response;
-                        node.connect(convolver);
-                        convolver.connect(offlineContext.destination);
-                    } else {
-                        node.connect(offlineContext.destination);
-                    }
+            if(play && checkAudio && playFromAPI) {
+                if(reverb) {
+                    convolver.buffer = audio_impulse_response;
+                    node.connect(convolver);
+                    convolver.connect(offlineContext.destination);
+                } else {
+                    node.connect(offlineContext.destination);
                 }
             }
         }
@@ -302,7 +294,11 @@ function validModify(play = false, save = false) {
         if(document.getElementById("checkCompa").checked == true) compaAudioAPI = true; else compaAudioAPI = false;
         document.getElementById("validInputModify").disabled = true;
         document.getElementById("saveInputModify").disabled = true;
-        renderAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio, save, play, "audio_ah_processed", compaAudioAPI);
+        if(compaAudioAPI && play) {
+            ah_click();
+        } else {
+            renderAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio, save, play, "audio_ah_processed", compaAudioAPI);
+        }
         return true;
     }
 
@@ -485,6 +481,7 @@ function endInit() {
     }
     
     stopSound();
+    compaMode();
     full();
 }
 
