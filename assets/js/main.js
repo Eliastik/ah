@@ -6,6 +6,7 @@ var speedAudio = 1;
 var pitchAudio = 1;
 var reverbAudio = false;
 var playFromAPI = false;
+var compaAudioAPI = false;
 var img_ah_src = "assets/img/ah.gif";
 document.getElementById("checkFull").checked = false;
 var repetitionInterval = 500;
@@ -65,10 +66,24 @@ function stopSound() {
     }
 }
 
-// https://github.com/also/soundtouch-js/issues/2
-function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = false, play = false, audioName = "sample", rate = 1, BUFFER_SIZE = 2048) {
+function compaMode() {
+    if(document.getElementById("checkCompa").checked == true) {
+        document.getElementById("saveInputModify").disabled = true;
+        document.getElementById("saveInputModify").setAttribute("title", "Non disponible en mode de compatibilité.");
+    } else {
+        document.getElementById("saveInputModify").disabled = false;
+        document.getElementById("saveInputModify").setAttribute("title", "");
+    }
+}
+
+function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = false, play = false, audioName = "sample", comp = false, rate = 1, BUFFER_SIZE = 4096) {
     if ('AudioContext' in window) {
-        var offlineContext = new OfflineAudioContext(2, 48000*15, 48000);
+        if(!comp) {
+            var offlineContext = new OfflineAudioContext(2, 48000*15, 48000);
+        } else {
+            var offlineContext = context;
+        }
+        
         if(reverb) var convolver = offlineContext.createConvolver();
         
         var st = new soundtouch.SoundTouch(48000);
@@ -77,39 +92,64 @@ function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = fals
         st.rate = rate;
         var filter = new soundtouch.SimpleFilter(new soundtouch.WebAudioBufferSource(audio), st);
         var node = soundtouch.getWebAudioNode(offlineContext, filter);
-
-        if(reverb) {
-            convolver.buffer = audio_impulse_response;
-            node.connect(convolver);
-            convolver.connect(offlineContext.destination);
-        } else {
-            node.connect(offlineContext.destination);
-        }
         
-        offlineContext.oncomplete = function(e) {
-            window[audioName] = e.renderedBuffer;
-            
-            document.getElementById("validInputModify").disabled = false;
-            if (typeof(Worker) !== "undefined") {
-                document.getElementById("saveInputModify").disabled = false;
-                document.getElementById("saveInputModify").setAttribute("title", "");
+        if(!comp) {
+            if(reverb) {
+                convolver.buffer = audio_impulse_response;
+                node.connect(convolver);
+                convolver.connect(offlineContext.destination);
             } else {
-                document.getElementById("saveInputModify").disabled = true;
-                document.getElementById("saveInputModify").setAttribute("title", "Désolé, votre navigateur est incompatible avec cette fonction.");
+                node.connect(offlineContext.destination);
             }
             
+            offlineContext.oncomplete = function(e) {
+                window[audioName] = e.renderedBuffer;
+                
+                document.getElementById("validInputModify").disabled = false;
+                document.getElementById("modify").disabled = false;
+                
+                if (typeof(Worker) !== "undefined") {
+                    document.getElementById("saveInputModify").disabled = false;
+                    document.getElementById("saveInputModify").setAttribute("title", "");
+                } else {
+                    document.getElementById("saveInputModify").disabled = true;
+                    document.getElementById("saveInputModify").setAttribute("title", "Désolé, votre navigateur est incompatible avec cette fonction.");
+                }
+
+                if(play) {
+                    ah_click();
+                }
+
+                if(save) {
+                    saveBuffer(e.renderedBuffer);
+                }
+            };
+            
+            offlineContext.startRendering();
+        } else {
             document.getElementById("modify").disabled = false;
-
+            document.getElementById("validInputModify").disabled = false;
+            document.getElementById("saveInputModify").disabled = true;
+            document.getElementById("saveInputModify").setAttribute("title", "Non disponible en mode de compatibilité.");
+            
             if(play) {
-                ah_click();
+                nb_ah = nb_ah + 1;
+                document.getElementById("ah_img").src = "#";
+                document.getElementById("ah_img").src = img_ah_src;
+                document.getElementById("ah_img").title = "Cliquez ici !";
+                document.getElementById("nb_ah").innerHTML = nb_ah;
+                
+                if(checkAudio && playFromAPI) {
+                    if(reverb) {
+                        convolver.buffer = audio_impulse_response;
+                        node.connect(convolver);
+                        convolver.connect(offlineContext.destination);
+                    } else {
+                        node.connect(offlineContext.destination);
+                    }
+                }
             }
-
-            if(save) {
-                saveBuffer(e.renderedBuffer);
-            }
-        };
-        
-        offlineContext.startRendering();
+        }
     } else {
         if(typeof(window.console.error) !== 'undefined') console.error("Web Audio API not supported by this browser.");
         return false;
@@ -183,24 +223,25 @@ function ah_click() {
 
 function ah_interval() {
     clearInterval(interval);
+    playFromAPI = false;
     ah();
     interval = setInterval(ah, repetitionInterval);
     document.getElementById("formInterval").style.display = "block";
     document.getElementById("formModify").style.display = "none";
-    playFromAPI = false;
 }
 
 function ah_stop() {
     clearInterval(interval);
+    playFromAPI = false;
     clearTimeout(timeout);
     document.getElementById("formInterval").style.display = "none";
     document.getElementById("formModify").style.display = "none";
-    playFromAPI = false;
 }
 
 function ah_modify() {
     clearInterval(interval);
     clearTimeout(timeout);
+    playFromAPI = true;
     document.getElementById("formInterval").style.display = "none";
     document.getElementById("formModify").style.display = "block";
     if(modifyFirstClick) {
@@ -208,14 +249,13 @@ function ah_modify() {
         validModify(false, false);
         modifyFirstClick = false;
     }
-    playFromAPI = true;
 }
 
 function validInterval() {
     try {
         var tmp_interval = document.getElementById("inputInterval").value;
     } catch(e) {
-        alert("Une erreur est survenue");
+        alert("Une erreur est survenue.");
         return false;
     }
 
@@ -239,7 +279,7 @@ function validModify(play = false, save = false) {
         var tmp_pitch = document.getElementById("pitchRange").value;
         var tmp_speed = document.getElementById("speedRange").value;
     } catch(e) {
-        alert("Une erreur est survenue");
+        alert("Une erreur est survenue.");
         return false;
     }
 
@@ -259,9 +299,10 @@ function validModify(play = false, save = false) {
         pitchAudio = tmp_pitch;
         speedAudio = tmp_speed;
         if(document.getElementById("checkReverb").checked == true) reverbAudio = true; else reverbAudio = false;
+        if(document.getElementById("checkCompa").checked == true) compaAudioAPI = true; else compaAudioAPI = false;
         document.getElementById("validInputModify").disabled = true;
         document.getElementById("saveInputModify").disabled = true;
-        renderAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio, save, play, "audio_ah_processed");
+        renderAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio, save, play, "audio_ah_processed", compaAudioAPI);
         return true;
     }
 
@@ -282,7 +323,11 @@ function ah() {
     if(checkAudio && !'AudioContext' in window) {
         ah.play();
     } else if(checkAudio && 'AudioContext' in window && playFromAPI) {
-        playBufferAudioAPI(audio_ah_processed);
+        if(!compaAudioAPI) {
+            playBufferAudioAPI(audio_ah_processed);
+        } else {
+            renderAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio, false, true, "audio_ah_processed", compaAudioAPI);
+        }
     } else if(checkAudio && playFromAPI == false) {
         ah.play();
     }

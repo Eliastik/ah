@@ -51,7 +51,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-lg-4 col-sm-6 col-md-6" id="formModify">
+                            <div class="col-lg-6 col-sm-6 col-md-6" id="formModify">
                                 <div class="form-group">
                                     <label for="pitchRange"><i class="fa fa-microphone" aria-hidden="true"></i> Pitch (hauteur de la voix) :</label>
                                     <div class="input-group">
@@ -63,6 +63,9 @@
                                     </div>
                                     <div class="input-group checkbox">
                                         <input type="checkbox" id="checkReverb" /> <label for="checkReverb">Réverbération</label>
+                                    </div>
+                                    <div class="input-group checkbox">
+                                        <input type="checkbox" id="checkCompa" onclick="compaMode();" /> <label for="checkCompa">Mode de compatibilité (cocher si aucun son n'est diffusé)</label>
                                     </div>
                                     <div class="input-group mt">
                                         <button class="btn btn-primary" type="button" id="validInputModify" onclick="validModify(true, false);"><i class="fa fa-check" aria-hidden="true"></i> Valider</button>
