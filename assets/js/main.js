@@ -202,7 +202,7 @@ function saveBuffer(buffer) {
         worker.postMessage({
             command: 'init',
             config: {
-                sampleRate: 48000,
+                sampleRate: context.sampleRate,
                 numChannels: 2
             }
         });
