@@ -81,7 +81,19 @@ function add(a, b) {
     return a + b;
 }
 
-function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = false, play = false, audioName = "sample", comp = false, rate = 1, BUFFER_SIZE = 4096) {
+function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp, rate, BUFFER_SIZE) {
+    // Default parameters
+    var speed = speed || 1; // Speed of the audio
+    var pitch = pitch || 1; // Pitch of the audio
+    var reverb = reverb || false; // Enable or disable reverb
+    var save = save || false; // Save the audio buffer under a wav file
+    var play = play || false; // Play the audio
+    var audioName = audioName || "sample"; // The audio buffer variable name (global)
+    var comp = comp || false; // Enable or disable the compatibility mode
+    var rate = rate || 1; // Rate of the audio
+    var BUFFER_SIZE = BUFFER_SIZE || 4096; // Buffer size of the audio
+    // End of default parameters
+    
     if ('AudioContext' in window) {
         if(!comp) {
             var offlineContext = new OfflineAudioContext(2, context.sampleRate*15, context.sampleRate);
