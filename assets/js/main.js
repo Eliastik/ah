@@ -108,7 +108,7 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
     
     if ('AudioContext' in window && !audioContextNotSupported) {
         if(!comp) {
-            var offlineContext = new OfflineAudioContext(2, 44100*15, 44100);
+            var offlineContext = new OfflineAudioContext(2, context.sampleRate*15, context.sampleRate);
         } else {
             var offlineContext = context;
         }
