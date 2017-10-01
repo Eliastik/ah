@@ -29,6 +29,9 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
         - Correction d'un plantage avec les navigateurs ne supportant pas l'API Web Audio ;
         - Correction du code d'initialisation ;
         - Corrections d'autres bugs mineurs et autres ajustements.
+    - Révision 1 de la version (1/10/2017) :
+        - Correction d'un bug en rapport avec la fonction Modifier la voix ;
+        - Correction d'un bug avec Internet Explorer.
 
 * Version 2.0 (14/09/2017) :
     - Possibilité de modifier la voix ! Différentes options sont disponibles : augmenter ou baisser la hauteur de la voix (effet chipmunk), la vitesse ou d'ajouter un effet de réverbération (fonctionne grâce à l'API Web Audio) ;
