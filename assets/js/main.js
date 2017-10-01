@@ -84,14 +84,14 @@ function add(a, b) {
 function renderAudioAPI(audio, speed = 1, pitch = 1, reverb = false, save = false, play = false, audioName = "sample", comp = false, rate = 1, BUFFER_SIZE = 4096) {
     if ('AudioContext' in window) {
         if(!comp) {
-            var offlineContext = new OfflineAudioContext(2, 48000*15, 48000);
+            var offlineContext = new OfflineAudioContext(2, context.sampleRate*15, context.sampleRate);
         } else {
             var offlineContext = context;
         }
         
         if(reverb) var convolver = offlineContext.createConvolver();
         
-        var st = new soundtouch.SoundTouch(48000);
+        var st = new soundtouch.SoundTouch(context.sampleRate);
         st.pitch = pitch;
         st.tempo = speed;
         st.rate = rate;
