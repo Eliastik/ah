@@ -30,7 +30,7 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
         - Correction du code d'initialisation ;
         - Corrections d'autres bugs mineurs et autres ajustements.
     - Révision 1 de la version (1/10/2017) :
-        - Correction d'un bug en rapport avec la fonction Modifier la voix ;
+        - Correction d'un bug en rapport avec la fonction Modifier la voix (fréquence d'échantillonnage de l'audio) ;
         - Correction d'un bug avec Internet Explorer.
 
 * Version 2.0 (14/09/2017) :
