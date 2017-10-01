@@ -108,14 +108,14 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
     
     if ('AudioContext' in window && !audioContextNotSupported) {
         if(!comp) {
-            var offlineContext = new OfflineAudioContext(2, context.sampleRate*15, context.sampleRate);
+            var offlineContext = new OfflineAudioContext(2, 44100*15, 44100);
         } else {
             var offlineContext = context;
         }
         
         if(reverb) var convolver = offlineContext.createConvolver();
         
-        var st = new soundtouch.SoundTouch(context.sampleRate);
+        var st = new soundtouch.SoundTouch(44100);
         st.pitch = pitch;
         st.tempo = speed;
         st.rate = rate;
