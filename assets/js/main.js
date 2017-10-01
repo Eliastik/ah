@@ -295,7 +295,12 @@ function validInterval() {
     return false;
 }
 
-function validModify(play = false, save = false) {
+function validModify(play, save) {
+    // Default parameters
+    var play = play || false;
+    var save = save || false;
+    // End of default parameters
+    
     try {
         var tmp_pitch = document.getElementById("pitchRange").value;
         var tmp_speed = document.getElementById("speedRange").value;
