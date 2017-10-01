@@ -13,9 +13,21 @@ document.getElementById("checkFull").checked = false;
 var repetitionInterval = 500;
 var imgArray = ['assets/img/ah.gif', 'assets/img/ah_full.gif'];
 var audioArray = ['assets/sounds/ah.mp3', 'assets/sounds/impulse_response.mp3'];
+var audioContextNotSupported = false;
 if('AudioContext' in window) {
-    var AudioContext = window.AudioContext || window.webkitAudioContext;
-    var context = new AudioContext();
+	try {
+		var AudioContext = window.AudioContext || window.webkitAudioContext;
+		var context = new AudioContext();
+	} catch(e) {
+		if(typeof(window.console.error) !== 'undefined') {
+			console.error("Error when creating Audio Context (seem to be unsupported):", e);
+		} else {
+			console.log("Error when creating Audio Context (seem to be unsupported):", e);
+		}
+		var audioContextNotSupported = true;
+	}
+} else {
+	var audioContextNotSupported = true;
 }
 var modifyFirstClick = true;
 
@@ -94,7 +106,7 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
     var BUFFER_SIZE = BUFFER_SIZE || 4096; // Buffer size of the audio
     // End of default parameters
     
-    if ('AudioContext' in window) {
+    if ('AudioContext' in window && !audioContextNotSupported) {
         if(!comp) {
             var offlineContext = new OfflineAudioContext(2, context.sampleRate*15, context.sampleRate);
         } else {
@@ -178,7 +190,7 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
 }
 
 function playBufferAudioAPI(buffer) {
-    if ('AudioContext' in window) {
+    if ('AudioContext' in window && !audioContextNotSupported) {
         var source = context.createBufferSource();
         source.buffer = buffer;
         source.start(0);
@@ -198,7 +210,7 @@ function saveBuffer(buffer) {
         return false;
     }
     
-    if ('AudioContext' in window) {
+    if ('AudioContext' in window && !audioContextNotSupported) {
         worker.postMessage({
             command: 'init',
             config: {
@@ -357,9 +369,9 @@ function ah() {
     document.getElementById("ah_img").src = img_ah_src;
     document.getElementById("ah_img").title = "Cliquez ici !";
 
-    if(checkAudio && !'AudioContext' in window) {
+    if(checkAudio && !'AudioContext' in window && !audioContextNotSupported) {
         ah.play();
-    } else if(checkAudio && 'AudioContext' in window && playFromAPI) {
+    } else if(checkAudio && 'AudioContext' in window && !audioContextNotSupported && playFromAPI) {
         if(!compaAudioAPI) {
             playBufferAudioAPI(audio_ah_processed);
         } else {
@@ -461,7 +473,7 @@ function preloadAudios(array) {
 }
 
 function loadAudioAPI(audio, dest) {
-    if ('AudioContext' in window) {
+    if ('AudioContext' in window && !audioContextNotSupported) {
         var request = new XMLHttpRequest();
         request.open('GET', audio, true);
         request.responseType = 'arraybuffer';
@@ -505,7 +517,7 @@ function endInit() {
     document.getElementById("ah_img").style.display = "block";
     document.getElementById("loading").style.display = "none";
 
-    if ('AudioContext' in window) {
+    if ('AudioContext' in window && !audioContextNotSupported) {
         document.getElementById("modify").disabled = false;
         document.getElementById("modify").setAttribute("title", "");
     } else {
