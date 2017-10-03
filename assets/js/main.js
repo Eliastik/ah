@@ -85,8 +85,13 @@ function compaMode() {
         document.getElementById("saveInputModify").disabled = true;
         document.getElementById("saveInputModify").setAttribute("title", "Non disponible en mode de compatibilité.");
     } else {
-        document.getElementById("saveInputModify").disabled = false;
-        document.getElementById("saveInputModify").setAttribute("title", "");
+        if (typeof(Worker) !== "undefined") {
+            document.getElementById("saveInputModify").disabled = false;
+            document.getElementById("saveInputModify").setAttribute("title", "");
+        } else {
+            document.getElementById("saveInputModify").disabled = true;
+            document.getElementById("saveInputModify").setAttribute("title", "Désolé, votre navigateur est incompatible avec cette fonction.");
+        }
     }
 }
 
