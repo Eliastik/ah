@@ -7,12 +7,13 @@ var pitchAudio = 1;
 var reverbAudio = false;
 var playFromAPI = false;
 var compaAudioAPI = false;
+var vocoderAudio = false;
 var compatModeChecked = false;
 var img_ah_src = "assets/img/ah.gif";
 document.getElementById("checkFull").checked = false;
 var repetitionInterval = 500;
 var imgArray = ['assets/img/ah.gif', 'assets/img/ah_full.gif'];
-var audioArray = ['assets/sounds/ah.mp3', 'assets/sounds/impulse_response.mp3'];
+var audioArray = ['assets/sounds/ah.mp3', 'assets/sounds/impulse_response.mp3', 'assets/sounds/modulator.mp3'];
 var audioContextNotSupported = false;
 if('AudioContext' in window) {
 	try {
@@ -93,7 +94,7 @@ function add(a, b) {
     return a + b;
 }
 
-function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp, rate, BUFFER_SIZE) {
+function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp, vocode, rate, BUFFER_SIZE) {
     // Default parameters
     var speed = speed || 1; // Speed of the audio
     var pitch = pitch || 1; // Pitch of the audio
@@ -102,6 +103,7 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
     var play = play || false; // Play the audio
     var audioName = audioName || "sample"; // The audio buffer variable name (global)
     var comp = comp || false; // Enable or disable the compatibility mode
+    var vocode = vocode || false;
     var rate = rate || 1; // Rate of the audio
     var BUFFER_SIZE = BUFFER_SIZE || 4096; // Buffer size of the audio
     // End of default parameters
@@ -115,12 +117,19 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
         
         if(reverb) var convolver = offlineContext.createConvolver();
         
+        if(vocode) {
+            var vocode = vocoder(offlineContext, audio_modulator, audio);
+            var audio = vocode;
+            console.log(audio);
+        }
+        
         var st = new soundtouch.SoundTouch(44100);
         st.pitch = pitch;
         st.tempo = speed;
         st.rate = rate;
         var filter = new soundtouch.SimpleFilter(new soundtouch.WebAudioBufferSource(audio), st);
         var node = soundtouch.getWebAudioNode(offlineContext, filter);
+        console.log(node);
         
         if(!comp) {
             if(reverb) {
@@ -136,6 +145,7 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
                 
                 document.getElementById("modify").disabled = false;
                 document.getElementById("validInputModify").disabled = false;
+                
                 if (typeof(Worker) !== "undefined") {
                     document.getElementById("saveInputModify").disabled = false;
                     document.getElementById("saveInputModify").setAttribute("title", "");
@@ -338,6 +348,7 @@ function validModify(play, save) {
         speedAudio = tmp_speed;
         if(document.getElementById("checkReverb").checked == true) reverbAudio = true; else reverbAudio = false;
         if(document.getElementById("checkCompa").checked == true) compaAudioAPI = true; else compaAudioAPI = false;
+        if(document.getElementById("checkVocode").checked == true) vocoderAudio = true; else vocoderAudio = false;
         document.getElementById("validInputModify").disabled = true;
         document.getElementById("saveInputModify").disabled = true;
         if(compaAudioAPI) {
@@ -350,7 +361,7 @@ function validModify(play, save) {
                 ah_click();
             }
         } else {
-            renderAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio, save, play, "audio_ah_processed", compaAudioAPI);
+            renderAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio, save, play, "audio_ah_processed", compaAudioAPI, vocoderAudio);
         }
         return true;
     }
@@ -375,7 +386,7 @@ function ah() {
         if(!compaAudioAPI) {
             playBufferAudioAPI(audio_ah_processed);
         } else {
-            renderAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio, false, true, "audio_ah_processed", compaAudioAPI);
+            renderAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio, false, true, "audio_ah_processed", compaAudioAPI, vocoderAudio);
         }
     } else if(checkAudio && playFromAPI == false) {
         ah.play();
@@ -495,6 +506,7 @@ function init() {
     preloadImages(imgArray);
     loadAudioAPI(audioArray[0], "audio_ah_buffer");
     loadAudioAPI(audioArray[1], "audio_impulse_response");
+    loadAudioAPI(audioArray[2], "audio_modulator");
     if(checkAudio == false) {
         document.getElementById("compa").style.display = "block";
         document.getElementById("compaInfo").innerHTML = "Votre navigateur ne supporte pas la lecture de fichiers audio. Vous n'entendrez pas le Ah de Denis Brogniart !";
