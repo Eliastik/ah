@@ -38,7 +38,7 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
         - Mise à jour de certaines bibliothèques logicielles ;
         - Ajout des avis de licence dans chaque fichier source du programme ;
         - Nettoyage et simplification du code.
-    - A venir : un outil à part qui reprendra une grande partie du code de l'outil Modifier la voix de ce programme avec la possibilité de modifier des fichiers audio ou encore d'enregistrer sa voix via un microphone connecté à l'ordinateur et de la modifier en temps réel avec des effets.
+    - A venir : une application web à part qui reprendra une grande partie du code de l'outil Modifier la voix de ce programme avec la possibilité de modifier des fichiers audio ou encore d'enregistrer sa voix via un microphone connecté à l'ordinateur et de la modifier en temps réel avec des effets.
 
 * Version 2.1 (1/10/2017) :
     - Possibilité d'enregistrer la voix modifiée sous la forme d'un fichier audio au format wav ;
