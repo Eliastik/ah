@@ -584,6 +584,8 @@ function loadAudioAPI(audio, dest) {
         request.responseType = 'arraybuffer';
 
         request.onload = function() {
+            checkAudioBuffer(dest);
+            
             context.decodeAudioData(request.response, function(data) {
                 window[dest] = data;
                 checkAudioBuffer(dest);
