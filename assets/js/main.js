@@ -532,6 +532,7 @@ function preloadAudios(array) {
                     var errorLoadingAudio = true;
                     document.getElementById("loadingInfo").innerHTML = "Chargement des sons : "+ loadedAudioCount +"/"+ array.length;
                     if (loadedAudioCount >= audioFiles.length) {
+                        initAudioAPI();
                         endInit();
                     }
                     audioFilesLoaded.push(this.src);
@@ -539,6 +540,7 @@ function preloadAudios(array) {
             };
             var timeOutLoading = setTimeout(function() {
                 if(loadedAudioCount == 0) {
+                    initAudioAPI();
                     endInit();
                 }
             }, 5000);
@@ -554,6 +556,7 @@ function preloadAudios(array) {
                             document.getElementById("loadingInfo").innerHTML = "Chargement des sons : "+ loadedAudioCount +"/"+ array.length;
 
                             if (loadedAudioCount >= audioFiles.length) {
+                                initAudioAPI();
                                 endInit();
                             }
                             audioFilesLoaded.push(this.src);
@@ -565,9 +568,11 @@ function preloadAudios(array) {
                 }());
             }
         } else {
+            initAudioAPI();
             endInit();
         }
     } else {
+        initAudioAPI();
         endInit();
     }
 }
@@ -581,6 +586,7 @@ function loadAudioAPI(audio, dest) {
         request.onload = function() {
             context.decodeAudioData(request.response, function(data) {
                 window[dest] = data;
+                checkAudioBuffer(dest);
             });
         }
 
@@ -591,11 +597,51 @@ function loadAudioAPI(audio, dest) {
     }
 }
 
-function init() {
-    preloadImages(imgArray);
+function checkAudioBuffer(bufferName) {
+    if ('AudioContext' in window && !audioContextNotSupported) {
+        switch(bufferName) {
+            case "audio_ah_buffer":
+                if(typeof(audio_ah_buffer) == "undefined") {
+                    setTooltip("modify", "Une erreur est survenue lors du chargement de certaines données. Cette fonctionnalité est donc indisponible. Essayez de recharger cette page (F5).", true, false, "wrapperModify", true);
+                } else {
+                    setTooltip("modify", "", false, true, "wrapperModify", true);
+                }
+            break;
+            case "audio_impulse_response":
+                if(typeof(audio_impulse_response) == "undefined") {
+                    setTooltip("checkReverb", "Une erreur est survenue lors du chargement de certaines données. Cette fonctionnalité est donc indisponible. Essayez de recharger cette page (F5).", true, false, "checkReverbWrapper", true);
+                    document.getElementById("checkReverb").checked = false;
+                    document.getElementById("checkReverbGroup").setAttribute("class", "input-group checkbox disabled");
+                } else {
+                    setTooltip("checkReverb", "", false, true, "checkReverbWrapper", true);
+                    document.getElementById("checkReverb").checked = false;
+                    document.getElementById("checkReverbGroup").setAttribute("class", "input-group checkbox");
+                }
+            break;
+            case "audio_modulator":
+                if(typeof(audio_modulator) == "undefined") {
+                    setTooltip("checkVocode", "Une erreur est survenue lors du chargement de certaines données. Cette fonctionnalité est donc indisponible. Essayez de recharger cette page (F5).", true, false, "checkVocodeWrapper", true);
+                    document.getElementById("checkVocode").checked = false;
+                    document.getElementById("checkVocodeGroup").setAttribute("class", "input-group checkbox disabled");
+                } else {
+                    setTooltip("checkVocode", "", false, true, "checkVocodeWrapper", true);
+                    document.getElementById("checkVocode").checked = false;
+                    document.getElementById("checkVocodeGroup").setAttribute("class", "input-group checkbox");
+                }
+            break;
+        }
+    }
+}
+
+function initAudioAPI() {
     loadAudioAPI(audioArray[0], "audio_ah_buffer");
     loadAudioAPI(audioArray[1], "audio_impulse_response");
     loadAudioAPI(audioArray[2], "audio_modulator");
+}
+
+function init() {
+    preloadImages(imgArray);
+    
     if(checkAudio == false) {
         document.getElementById("compa").style.display = "block";
         document.getElementById("compaInfo").innerHTML = "Votre navigateur ne supporte pas la lecture de fichiers audio. Vous n'entendrez pas le Ah de Denis Brogniart !";
@@ -618,33 +664,7 @@ function endInit() {
     document.getElementById("ah_img").style.display = "block";
     document.getElementById("loading").style.display = "none";
 
-    if ('AudioContext' in window && !audioContextNotSupported) {
-        if(typeof(audio_ah_buffer) == "undefined" || audio_ah_buffer == null) {
-            setTooltip("modify", "Une erreur est survenue lors du chargement de certaines données. Cette fonctionnalité est donc indisponible. Essayez de recharger cette page (F5).", true, false, "wrapperModify", true);
-        } else {
-            setTooltip("modify", "", false, true, "wrapperModify", true);
-        }
-        
-        if(typeof(audio_impulse_response) == "undefined" || audio_impulse_response == null) {
-            setTooltip("checkReverb", "Une erreur est survenue lors du chargement de certaines données. Cette fonctionnalité est donc indisponible. Essayez de recharger cette page (F5).", true, false, "checkReverbWrapper", true);
-            document.getElementById("checkReverb").checked = false;
-            document.getElementById("checkReverbGroup").setAttribute("class", "input-group checkbox disabled");
-        } else {
-            setTooltip("checkReverb", "", false, true, "checkReverbWrapper", true);
-            document.getElementById("checkReverb").checked = false;
-            document.getElementById("checkReverbGroup").setAttribute("class", "input-group checkbox");
-        }
-        
-        if(typeof(audio_modulator) == "undefined" || audio_modulator == null) {
-            setTooltip("checkVocode", "Une erreur est survenue lors du chargement de certaines données. Cette fonctionnalité est donc indisponible. Essayez de recharger cette page (F5).", true, false, "checkVocodeWrapper", true);
-            document.getElementById("checkVocode").checked = false;
-            document.getElementById("checkVocodeGroup").setAttribute("class", "input-group checkbox disabled");
-        } else {
-            setTooltip("checkVocode", "", false, true, "checkVocodeWrapper", true);
-            document.getElementById("checkVocode").checked = false;
-            document.getElementById("checkVocodeGroup").setAttribute("class", "input-group checkbox");
-        }
-    } else {
+    if (!'AudioContext' in window || audioContextNotSupported) {
         setTooltip("modify", "Désolé, cette fonction est incompatible avec votre navigateur.", true, false, "wrapperModify", true);
     }
 
