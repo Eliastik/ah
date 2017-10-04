@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2017 Eliastik (eliastiksofts.com)
- * 
+ *
  * This file is part of "Denis Brogniart – Ah !".
- * 
+ *
  * "Denis Brogniart – Ah !" is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * "Denis Brogniart – Ah !" is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with "Denis Brogniart – Ah !".  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -39,19 +39,19 @@ var audioContextNotSupported = false;
 var modifyFirstClick = true;
 var audioProcessing = false;
 if('AudioContext' in window) {
-	try {
-		var AudioContext = window.AudioContext || window.webkitAudioContext;
-		var context = new AudioContext();
-	} catch(e) {
-		if(typeof(window.console.error) !== 'undefined') {
-			console.error("Error when creating Audio Context (the Web Audio API seem to be unsupported):", e);
-		} else {
-			console.log("Error when creating Audio Context (the Web Audio API seem to be unsupported):", e);
-		}
-		var audioContextNotSupported = true;
-	}
+    try {
+        var AudioContext = window.AudioContext || window.webkitAudioContext;
+        var context = new AudioContext();
+    } catch(e) {
+        if(typeof(window.console.error) !== 'undefined') {
+            console.error("Error when creating Audio Context (the Web Audio API seem to be unsupported):", e);
+        } else {
+            console.log("Error when creating Audio Context (the Web Audio API seem to be unsupported):", e);
+        }
+        var audioContextNotSupported = true;
+    }
 } else {
-	var audioContextNotSupported = true;
+    var audioContextNotSupported = true;
 }
 // End of the default variables
 
@@ -91,7 +91,7 @@ function full() {
         img_ah_src = imgArray[0];
         img_ah_type = 1;
     }
-    
+
     ah();
 }
 
@@ -134,19 +134,19 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
     var rate = rate || 1; // Rate of the audio
     var BUFFER_SIZE = BUFFER_SIZE || 4096; // Buffer size of the audio
     // End of default parameters
-    
+
     if ('AudioContext' in window && !audioContextNotSupported) {
         if(!comp) {
             var offlineContext = new OfflineAudioContext(2, context.sampleRate*15, context.sampleRate);
         } else {
             var offlineContext = context;
         }
-        
+
         document.getElementById("processingModifLoader").style.display = "block";
         document.getElementById("validInputModify").disabled = true;
         document.getElementById("saveInputModify").disabled = true;
         audioProcessing = true;
-        
+
         function renderAudio(buffer) {
             var st = new soundtouch.SoundTouch(44100);
             st.pitch = pitch;
@@ -154,7 +154,7 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
             st.rate = rate;
             var filter = new soundtouch.SimpleFilter(new soundtouch.WebAudioBufferSource(buffer), st);
             var node = soundtouch.getWebAudioNode(offlineContext, filter);
-            
+
             if(!comp) {
                 if(reverb) {
                     convolver.buffer = audio_impulse_response;
@@ -163,26 +163,26 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
                 } else {
                     node.connect(offlineContext.destination);
                 }
-                
+
                 offlineContext.oncomplete = function(e) {
                     window[audioName] = e.renderedBuffer;
-                    
+
                     document.getElementById("modify").disabled = false;
                     document.getElementById("validInputModify").disabled = false;
                     document.getElementById("processingModifLoader").style.display = "none";
                     audioProcessing = false;
                     compaMode();
-                    
+
                     if(!compatModeChecked) {
                         var sum = e.renderedBuffer.getChannelData(0).reduce(add, 0);
-                        
+
                         if(sum == 0) {
                             document.getElementById("checkCompa").checked = true;
                             compaMode();
                             document.getElementById("compatAutoDetected").style.display = "block";
                             compaAudioAPI = true;
                         }
-                        
+
                         compatModeChecked = true;
                     }
 
@@ -194,7 +194,7 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
                         saveBuffer(e.renderedBuffer);
                     }
                 };
-                
+
                 offlineContext.startRendering();
             } else {
                 document.getElementById("modify").disabled = false;
@@ -202,7 +202,7 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
                 document.getElementById("processingModifLoader").style.display = "none";
                 audioProcessing = false;
                 compaMode();
-                
+
                 if(play && checkAudio && playFromAPI) {
                     if(reverb) {
                         convolver.buffer = audio_impulse_response;
@@ -212,11 +212,11 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
                         node.connect(offlineContext.destination);
                     }
                 }
-                
+
                 reloadAnimation(); // reload the animation
             }
         }
-        
+
         if(reverb) var convolver = offlineContext.createConvolver();
         if(vocode) {
             var offlineContext2 = new OfflineAudioContext(2, context.sampleRate*15, context.sampleRate);
@@ -254,7 +254,7 @@ function saveBuffer(buffer) {
         if(typeof(window.console.error) !== 'undefined') console.error("Workers are not supported by this browser.");
         return false;
     }
-    
+
     if ('AudioContext' in window && !audioContextNotSupported) {
         worker.postMessage({
             command: 'init',
@@ -322,7 +322,7 @@ function validModify(play, save) {
     var play = play || false;
     var save = save || false;
     // End of default parameters
-    
+
     try {
         var tmp_pitch = document.getElementById("pitchRange").value;
         var tmp_speed = document.getElementById("speedRange").value;
@@ -333,12 +333,12 @@ function validModify(play, save) {
 
     playFromAPI = true;
 
-    if(isNaN(tmp_pitch) || tmp_pitch == "" || tmp_pitch <= 0 || tmp_pitch > 2) {
+    if(isNaN(tmp_pitch) || tmp_pitch == "" || tmp_pitch <= 0 || tmp_pitch > 5) {
         alert("Valeur du pitch invalide !");
         document.getElementById("pitchRange").value = pitchAudio;
         document.getElementById("speedRange").value = speedAudio;
         return false;
-    } else if(isNaN(tmp_speed) || tmp_speed == "" || tmp_speed <= 0 || tmp_speed > 2) {
+    } else if(isNaN(tmp_speed) || tmp_speed == "" || tmp_speed <= 0 || tmp_speed > 5) {
         alert("Valeur de la vitesse invalide !");
         document.getElementById("pitchRange").value = pitchAudio;
         document.getElementById("speedRange").value = speedAudio;
@@ -355,7 +355,7 @@ function validModify(play, save) {
                 document.getElementById("validInputModify").disabled = false;
                 reloadAnimation();
             }
-            
+
             if(play) {
                 ah_click();
             }
@@ -377,12 +377,12 @@ function setTooltip(element, text, disable, enable,  otherElement, byId) {
     var enable = enable || false;
     var byId = byId || false; // getElementById on element and otherElement
     // End of default parameters
-    
+
     if(byId) {
         element = document.getElementById(element);
         otherElement = document.getElementById(otherElement);
     }
-    
+
     if(disable) element.disabled = true;
     if(enable) element.disabled = false;
     if(text !== "" && text !== null) {
@@ -410,7 +410,7 @@ function setTooltip(element, text, disable, enable,  otherElement, byId) {
             //if(typeof(Tooltip(element).hide) !== "undefined") Tooltip(element, null).hide();
         }
     }
-    
+
     return true;
 }
 
@@ -574,7 +574,7 @@ function loadAudioAPI(audio, dest) {
         var request = new XMLHttpRequest();
         request.open('GET', audio, true);
         request.responseType = 'arraybuffer';
-        
+
         request.onload = function() {
             context.decodeAudioData(request.response, function(data) {
                 window[dest] = data;
@@ -624,13 +624,13 @@ function endInit() {
     } else {
         setTooltip("modify", "Désolé, cette fonction est incompatible avec votre navigateur.", true, false, "wrapperModify", true);
     }
-    
+
     if (typeof(Worker) !== "undefined") {
         setTooltip("saveInputModify", "", false, true, "wrapperSave", true);
     } else {
         setTooltip("saveInputModify", "Désolé, cette fonction est incompatible avec votre navigateur.", true, false, "wrapperSave", true);
     }
-    
+
     stopSound();
     compaMode();
     full();
