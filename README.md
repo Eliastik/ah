@@ -16,7 +16,8 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 
 * Utilise le thème Bootstrap Cosmo de Bootswatch ([https://bootswatch.com/cosmo/](https://bootswatch.com/cosmo/)), sous [licence MIT](https://tldrlegal.com/license/mit-license)
 * Utilise la police d'icônes [Font Awesome](http://fontawesome.io/), sous [licence SIL OFL 1.1](http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL) et [MIT](https://tldrlegal.com/license/mit-license)
-* Utilise la bibliothèque logicielle [Soundtouch.js](https://github.com/ZVK/stretcher/blob/master/soundtouch.js) sous [licence GNU LGPL 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.fr.html).
+* Utilise la bibliothèque logicielle [Soundtouch.js](https://github.com/ZVK/stretcher/blob/master/soundtouch.js) sous [licence GNU LGPL 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.fr.html)
+* Utilise la bibliothèque logicielle [Vocoder.js](https://github.com/jergason/Vocoder) sous [licence MIT](https://github.com/jergason/Vocoder/blob/master/LICENSE.txt) (code légèrement modifié)
 * Utilise la bibliothèque logicielle [Recorderjs](https://github.com/mattdiamond/Recorderjs) ([version Worker](https://github.com/mattdiamond/Recorderjs/blob/ac0eb8a7c2601fc4ec1cbd1b1ee49f45a6c79580/recorderWorker.js)) sous [licence MIT](https://tldrlegal.com/license/mit-license).
 * Utilise la bibliothèque logicielle [Boostrap Slider](https://github.com/seiyria/bootstrap-slider) en version 9.9.0, sous [licence MIT](https://github.com/seiyria/bootstrap-slider/blob/master/LICENSE.md)
 * Utilise la bibliothèque logicielle [Boostrap Native](https://github.com/thednp/bootstrap.native), sous [licence MIT](https://github.com/thednp/bootstrap.native/blob/master/LICENSE)
@@ -87,13 +88,12 @@ Les navigateurs suivants sont partiellement compatibles :
 
 Pour pouvoir utiliser la fonction &laquo; Modifier la voix &raquo;, il vous faut un navigateur relativement récent (les dernières versions des navigateurs ci-dessus sont usuellement compatibles avec cette fonction, sauf Internet Explorer).
 
-Il n'est pas encore possible d'enregistrer les voix modifiées avec Firefox pour l'instant, à cause d'un [bug de ce navigateur](https://bugzilla.mozilla.org/show_bug.cgi?id=1031851).
+Il n'est pas encore possible d'enregistrer les voix modifiées avec Firefox ou Edge pour l'instant, à cause d'un [bug de ce navigateur](https://bugzilla.mozilla.org/show_bug.cgi?id=1031851).
 
 ## To-do list :
 
 To-do uniquement si possible :
 
-* Effet Vocoder pour la fonction Modifier la voix ;
 * Vérifier la compatibilité avec les futures versions de Firefox (bug).
 
 ## Déclaration de licence

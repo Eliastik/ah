@@ -115,3 +115,12 @@ label {
     border-color: #1967be;
     color: white;
 }
+.disabled-button-wrapper {
+    display: inline-block;
+}
+.disabled-button-wrapper .btn[disabled] {
+    pointer-events: none;
+}
+.disabled-button-wrapper {
+    cursor: not-allowed;
+}

@@ -106,15 +106,12 @@ function stopSound() {
 function compaMode() {
     if(!audioProcessing) {
         if(document.getElementById("checkCompa").checked == true) {
-            document.getElementById("saveInputModify").disabled = true;
-            document.getElementById("saveInputModify").setAttribute("title", "Non disponible en mode de compatibilité.");
+            setTooltip("saveInputModify", "Non disponible en mode de compatibilité.", true, false, "wrapperSave", true);
         } else {
             if (typeof(Worker) !== "undefined") {
-                document.getElementById("saveInputModify").disabled = false;
-                document.getElementById("saveInputModify").setAttribute("title", "");
+                setTooltip("saveInputModify", null, false, true, "wrapperSave", true);
             } else {
-                document.getElementById("saveInputModify").disabled = true;
-                document.getElementById("saveInputModify").setAttribute("title", "Désolé, cette fonction est incompatible avec votre navigateur.");
+                setTooltip("saveInputModify", "Désolé, cette fonction est incompatible avec votre navigateur.", true, false, "wrapperSave", true);
             }
         }
     }
@@ -371,6 +368,52 @@ function validModify(play, save) {
     return false;
 }
 
+function setTooltip(element, text, disable, enable,  otherElement, byId) {
+    // Default parameters
+    var element = element || null;
+    var otherElement = otherElement || null;
+    var text = text || null;
+    var disable = disable || false;
+    var enable = enable || false;
+    var byId = byId || false; // getElementById on element and otherElement
+    // End of default parameters
+    
+    if(byId) {
+        element = document.getElementById(element);
+        otherElement = document.getElementById(otherElement);
+    }
+    
+    if(disable) element.disabled = true;
+    if(enable) element.disabled = false;
+    if(text !== "" && text !== null) {
+        if(otherElement !== null) {
+            otherElement.setAttribute("data-original-title", text);
+            new Tooltip(otherElement, {
+                placement: 'bottom',
+                animation: 'fade',
+                delay: 50,
+            });
+        } else {
+            element.setAttribute("data-original-title", text);
+            new Tooltip(element, {
+                placement: 'bottom',
+                animation: 'fade',
+                delay: 50,
+            });
+        }
+    } else {
+        if(otherElement !== null) {
+            otherElement.setAttribute("data-original-title", "");
+            //if(typeof(Tooltip(otherElement).hide) !== "undefined") Tooltip(otherElement, null).hide();
+        } else {
+            element.setAttribute("data-original-title", "");
+            //if(typeof(Tooltip(element).hide) !== "undefined") Tooltip(element, null).hide();
+        }
+    }
+    
+    return true;
+}
+
 function reloadAnimation() {
     nb_ah = nb_ah + 1;
     document.getElementById("ah_img").src = "#";
@@ -573,19 +616,19 @@ function endInit() {
     document.getElementById("loading").style.display = "none";
 
     if ('AudioContext' in window && !audioContextNotSupported) {
-        document.getElementById("modify").disabled = false;
-        document.getElementById("modify").setAttribute("title", "");
+        if(typeof(audio_ah_buffer) == "undefined") {
+            setTooltip("modify", "Une erreur est survenue lors du chargement de certaines données. Cette fonctionnalité est donc indisponible. Essayez de recharger cette page (F5).", true, false, "wrapperModify", true);
+        } else {
+            setTooltip("modify", "", false, true, "wrapperModify", true);
+        }
     } else {
-        document.getElementById("modify").disabled = true;
-        document.getElementById("modify").setAttribute("title", "Désolé, cette fonction est incompatible avec votre navigateur.");
+        setTooltip("modify", "Désolé, cette fonction est incompatible avec votre navigateur.", true, false, "wrapperModify", true);
     }
     
     if (typeof(Worker) !== "undefined") {
-        document.getElementById("saveInputModify").disabled = false;
-        document.getElementById("saveInputModify").setAttribute("title", "");
+        setTooltip("saveInputModify", "", false, true, "wrapperSave", true);
     } else {
-        document.getElementById("saveInputModify").disabled = true;
-        document.getElementById("saveInputModify").setAttribute("title", "Désolé, cette fonction est incompatible avec votre navigateur.");
+        setTooltip("saveInputModify", "Désolé, cette fonction est incompatible avec votre navigateur.", true, false, "wrapperSave", true);
     }
     
     stopSound();

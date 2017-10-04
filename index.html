@@ -52,7 +52,9 @@
                         <div class="form-group">
                             <button type="button" class="btn btn-primary" href="#null" onclick="ah_interval();" id="repeat" disabled="disabled"><i class="fa fa-repeat fa-fw" aria-hidden="true"></i> Répéter</button>
                             <button type="button" class="btn btn-danger" href="#null" onclick="ah_stop();" id="stop" disabled="disabled"><i class="fa fa-stop fa-fw" aria-hidden="true"></i> Stop</button>
-                            <button type="button" class="btn btn-default" href="#null" onclick="ah_modify();" id="modify" disabled="disabled"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Modifier la voix</button>
+                            <div class="disabled-button-wrapper" id="wrapperModify">
+                                <button type="button" class="btn btn-default" href="#null" onclick="ah_modify();" id="modify" disabled="disabled"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Modifier la voix</button>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-lg-4 col-sm-6 col-md-6" id="formInterval">
@@ -94,7 +96,9 @@
                                     <div class="input-group mt">
                                         <button class="btn btn-primary" type="button" id="validInputModify" onclick="validModify(true, false);"><i class="fa fa-check" aria-hidden="true"></i> Valider</button>
                                         &nbsp;
-                                        <button class="btn btn-default" type="button" id="saveInputModify" onclick="validModify(false, true);" disabled="disabled"><i class="fa fa-save" aria-hidden="true"></i> Enregistrer</button>
+                                        <div class="disabled-button-wrapper" id="wrapperSave">
+                                            <button class="btn btn-default" type="button" id="saveInputModify" onclick="validModify(false, true);" disabled="disabled"><i class="fa fa-save" aria-hidden="true"></i> Enregistrer</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -133,7 +137,7 @@
                 </ul>
                 </p>
                 <p>Pour pouvoir utiliser la fonction &laquo; Modifier la voix &raquo;, il vous faut un navigateur relativement récent (les dernières versions des navigateurs ci-dessus sont usuellement compatibles avec cette fonction, sauf Internet Explorer).</p>
-                <p>Il n'est pas encore possible d'enregistrer les voix modifiées avec Firefox pour l'instant, à cause d'un <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1031851" target="_blank">bug de ce navigateur</a>.</p>
+                <p>Il n'est pas encore possible d'enregistrer les voix modifiées avec Firefox ou Edge pour l'instant, à cause d'un <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1031851" target="_blank">bug de ce navigateur</a>.</p>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times fa-fw" aria-hidden="true"></i> Fermer</button>
