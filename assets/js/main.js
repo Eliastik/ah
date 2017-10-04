@@ -37,6 +37,7 @@ var audioArray = ['assets/sounds/ah.mp3', 'assets/sounds/impulse_response.mp3', 
 var audio_ah_buffer, audio_impulse_response, audio_modulator = null;
 var audioContextNotSupported = false;
 var modifyFirstClick = true;
+var audioProcessing = false;
 if('AudioContext' in window) {
 	try {
 		var AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -103,16 +104,18 @@ function stopSound() {
 }
 
 function compaMode() {
-    if(document.getElementById("checkCompa").checked == true) {
-        document.getElementById("saveInputModify").disabled = true;
-        document.getElementById("saveInputModify").setAttribute("title", "Non disponible en mode de compatibilité.");
-    } else {
-        if (typeof(Worker) !== "undefined") {
-            document.getElementById("saveInputModify").disabled = false;
-            document.getElementById("saveInputModify").setAttribute("title", "");
-        } else {
+    if(!audioProcessing) {
+        if(document.getElementById("checkCompa").checked == true) {
             document.getElementById("saveInputModify").disabled = true;
-            document.getElementById("saveInputModify").setAttribute("title", "Désolé, cette fonction est incompatible avec votre navigateur.");
+            document.getElementById("saveInputModify").setAttribute("title", "Non disponible en mode de compatibilité.");
+        } else {
+            if (typeof(Worker) !== "undefined") {
+                document.getElementById("saveInputModify").disabled = false;
+                document.getElementById("saveInputModify").setAttribute("title", "");
+            } else {
+                document.getElementById("saveInputModify").disabled = true;
+                document.getElementById("saveInputModify").setAttribute("title", "Désolé, cette fonction est incompatible avec votre navigateur.");
+            }
         }
     }
 }
@@ -145,6 +148,7 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
         document.getElementById("processingModifLoader").style.display = "block";
         document.getElementById("validInputModify").disabled = true;
         document.getElementById("saveInputModify").disabled = true;
+        audioProcessing = true;
         
         function renderAudio(buffer) {
             var st = new soundtouch.SoundTouch(44100);
@@ -168,16 +172,9 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
                     
                     document.getElementById("modify").disabled = false;
                     document.getElementById("validInputModify").disabled = false;
-                    
-                    if (typeof(Worker) !== "undefined") {
-                        document.getElementById("saveInputModify").disabled = false;
-                        document.getElementById("saveInputModify").setAttribute("title", "");
-                    } else {
-                        document.getElementById("saveInputModify").disabled = true;
-                        document.getElementById("saveInputModify").setAttribute("title", "Désolé, cette fonction est incompatible avec votre navigateur.");
-                    }
-        
                     document.getElementById("processingModifLoader").style.display = "none";
+                    audioProcessing = false;
+                    compaMode();
                     
                     if(!compatModeChecked) {
                         var sum = e.renderedBuffer.getChannelData(0).reduce(add, 0);
@@ -203,12 +200,11 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
                 
                 offlineContext.startRendering();
             } else {
-                document.getElementById("saveInputModify").disabled = true;
-                document.getElementById("saveInputModify").setAttribute("title", "Non disponible en mode de compatibilité.");
-            
                 document.getElementById("modify").disabled = false;
                 document.getElementById("validInputModify").disabled = false;
                 document.getElementById("processingModifLoader").style.display = "none";
+                audioProcessing = false;
+                compaMode();
                 
                 if(play && checkAudio && playFromAPI) {
                     if(reverb) {
