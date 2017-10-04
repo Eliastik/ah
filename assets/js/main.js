@@ -376,6 +376,7 @@ function validModify(play, save) {
             if(checkAudio !== true || play !== true) {
                 document.getElementById("modify").disabled = false;
                 document.getElementById("validInputModify").disabled = false;
+                reloadAnimation();
             }
             
             if(play) {
@@ -416,6 +417,8 @@ function ah() {
         }
     } else if(checkAudio && playFromAPI == false) {
         ah.play();
+        reloadAnimation();
+    } else {
         reloadAnimation();
     }
 }
