@@ -108,7 +108,7 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
     var play = play || false; // Play the audio
     var audioName = audioName || "sample"; // The audio buffer variable name (global)
     var comp = comp || false; // Enable or disable the compatibility mode
-    var vocode = vocode || false;
+    var vocode = vocode || false; // Enable or disable vocoder
     var rate = rate || 1; // Rate of the audio
     var BUFFER_SIZE = BUFFER_SIZE || 4096; // Buffer size of the audio
     // End of default parameters
@@ -120,75 +120,15 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
             var offlineContext = context;
         }
         
-        if(reverb) var convolver = offlineContext.createConvolver();
-        
-        if(vocode) {
-            var vocode = vocoder(offlineContext, audio_modulator, audio);
-            var audio = vocode;
-            console.log(audio);
-        }
-        
-        var st = new soundtouch.SoundTouch(44100);
-        st.pitch = pitch;
-        st.tempo = speed;
-        st.rate = rate;
-        var filter = new soundtouch.SimpleFilter(new soundtouch.WebAudioBufferSource(audio), st);
-        var node = soundtouch.getWebAudioNode(offlineContext, filter);
-        console.log(node);
-        
-        if(!comp) {
-            if(reverb) {
-                convolver.buffer = audio_impulse_response;
-                node.connect(convolver);
-                convolver.connect(offlineContext.destination);
-            } else {
-                node.connect(offlineContext.destination);
-            }
+        function renderAudio(buffer) {
+            var st = new soundtouch.SoundTouch(44100);
+            st.pitch = pitch;
+            st.tempo = speed;
+            st.rate = rate;
+            var filter = new soundtouch.SimpleFilter(new soundtouch.WebAudioBufferSource(buffer), st);
+            var node = soundtouch.getWebAudioNode(offlineContext, filter);
             
-            offlineContext.oncomplete = function(e) {
-                window[audioName] = e.renderedBuffer;
-                
-                document.getElementById("modify").disabled = false;
-                document.getElementById("validInputModify").disabled = false;
-                
-                if (typeof(Worker) !== "undefined") {
-                    document.getElementById("saveInputModify").disabled = false;
-                    document.getElementById("saveInputModify").setAttribute("title", "");
-                } else {
-                    document.getElementById("saveInputModify").disabled = true;
-                    document.getElementById("saveInputModify").setAttribute("title", "Désolé, votre navigateur est incompatible avec cette fonction.");
-                }
-                
-                if(!compatModeChecked) {
-                    var sum = e.renderedBuffer.getChannelData(0).reduce(add, 0);
-                    
-                    if(sum == 0) {
-                        document.getElementById("checkCompa").checked = true;
-                        compaMode();
-                        document.getElementById("compatAutoDetected").style.display = "block";
-                        compaAudioAPI = true;
-                    }
-                    
-                    compatModeChecked = true;
-                }
-
-                if(play) {
-                    ah_click();
-                }
-
-                if(save) {
-                    saveBuffer(e.renderedBuffer);
-                }
-            };
-            
-            offlineContext.startRendering();
-        } else {
-            document.getElementById("saveInputModify").disabled = true;
-            document.getElementById("saveInputModify").setAttribute("title", "Non disponible en mode de compatibilité.");
-        
-            document.getElementById("modify").disabled = false;
-            document.getElementById("validInputModify").disabled = false;
-            if(play && checkAudio && playFromAPI) {
+            if(!comp) {
                 if(reverb) {
                     convolver.buffer = audio_impulse_response;
                     node.connect(convolver);
@@ -196,7 +136,72 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
                 } else {
                     node.connect(offlineContext.destination);
                 }
+                
+                offlineContext.oncomplete = function(e) {
+                    window[audioName] = e.renderedBuffer;
+                    
+                    document.getElementById("modify").disabled = false;
+                    document.getElementById("validInputModify").disabled = false;
+                    
+                    if (typeof(Worker) !== "undefined") {
+                        document.getElementById("saveInputModify").disabled = false;
+                        document.getElementById("saveInputModify").setAttribute("title", "");
+                    } else {
+                        document.getElementById("saveInputModify").disabled = true;
+                        document.getElementById("saveInputModify").setAttribute("title", "Désolé, votre navigateur est incompatible avec cette fonction.");
+                    }
+                    
+                    if(!compatModeChecked) {
+                        var sum = e.renderedBuffer.getChannelData(0).reduce(add, 0);
+                        
+                        if(sum == 0) {
+                            document.getElementById("checkCompa").checked = true;
+                            compaMode();
+                            document.getElementById("compatAutoDetected").style.display = "block";
+                            compaAudioAPI = true;
+                        }
+                        
+                        compatModeChecked = true;
+                    }
+
+                    if(play) {
+                        ah_click();
+                    }
+
+                    if(save) {
+                        saveBuffer(e.renderedBuffer);
+                    }
+                };
+                
+                offlineContext.startRendering();
+            } else {
+                document.getElementById("saveInputModify").disabled = true;
+                document.getElementById("saveInputModify").setAttribute("title", "Non disponible en mode de compatibilité.");
+            
+                document.getElementById("modify").disabled = false;
+                document.getElementById("validInputModify").disabled = false;
+                if(play && checkAudio && playFromAPI) {
+                    if(reverb) {
+                        convolver.buffer = audio_impulse_response;
+                        node.connect(convolver);
+                        convolver.connect(offlineContext.destination);
+                    } else {
+                        node.connect(offlineContext.destination);
+                    }
+                }
             }
+        }
+        
+        if(reverb) var convolver = offlineContext.createConvolver();
+        if(vocode) {
+            var offlineContext2 = new OfflineAudioContext(2, context.sampleRate*15, context.sampleRate);
+            offlineContext2.oncomplete = function(e) {
+                renderAudio(e.renderedBuffer);
+            };
+            vocoder(offlineContext2, audio_modulator, audio);
+            offlineContext2.startRendering();
+        } else {
+            renderAudio(audio);
         }
     } else {
         if(typeof(window.console.error) !== 'undefined') console.error("Web Audio API not supported by this browser.");
