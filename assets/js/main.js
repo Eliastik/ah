@@ -1,3 +1,22 @@
+/* 
+ * Copyright (C) 2017 Eliastik (eliastiksofts.com)
+ * 
+ * This file is part of "Denis Brogniart – Ah !".
+ * 
+ * "Denis Brogniart – Ah !" is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * "Denis Brogniart – Ah !" is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with "Denis Brogniart – Ah !".  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 // Pure JS. No Jquery.
 // Default variables
 var nb_ah = 0;
@@ -282,41 +301,6 @@ function saveBuffer(buffer) {
     }
 }
 
-function ah_click() {
-    clearTimeout(timeout);
-    timeout = setTimeout(ah, 50);
-}
-
-function ah_interval() {
-    clearInterval(interval);
-    playFromAPI = false;
-    ah();
-    interval = setInterval(ah, repetitionInterval);
-    document.getElementById("formInterval").style.display = "block";
-    document.getElementById("formModify").style.display = "none";
-}
-
-function ah_stop() {
-    clearInterval(interval);
-    playFromAPI = false;
-    clearTimeout(timeout);
-    document.getElementById("formInterval").style.display = "none";
-    document.getElementById("formModify").style.display = "none";
-}
-
-function ah_modify() {
-    clearInterval(interval);
-    clearTimeout(timeout);
-    playFromAPI = true;
-    document.getElementById("formInterval").style.display = "none";
-    document.getElementById("formModify").style.display = "block";
-    if(modifyFirstClick) {
-        document.getElementById("modify").disabled = true;
-        validModify(false, false);
-        modifyFirstClick = false;
-    }
-}
-
 function validInterval() {
     try {
         var tmp_interval = document.getElementById("inputInterval").value;
@@ -420,6 +404,41 @@ function ah() {
         reloadAnimation();
     } else {
         reloadAnimation();
+    }
+}
+
+function ah_click() {
+    clearTimeout(timeout);
+    timeout = setTimeout(ah, 50);
+}
+
+function ah_interval() {
+    clearInterval(interval);
+    playFromAPI = false;
+    ah();
+    interval = setInterval(ah, repetitionInterval);
+    document.getElementById("formInterval").style.display = "block";
+    document.getElementById("formModify").style.display = "none";
+}
+
+function ah_stop() {
+    clearInterval(interval);
+    playFromAPI = false;
+    clearTimeout(timeout);
+    document.getElementById("formInterval").style.display = "none";
+    document.getElementById("formModify").style.display = "none";
+}
+
+function ah_modify() {
+    clearInterval(interval);
+    clearTimeout(timeout);
+    playFromAPI = true;
+    document.getElementById("formInterval").style.display = "none";
+    document.getElementById("formModify").style.display = "block";
+    if(modifyFirstClick) {
+        document.getElementById("modify").disabled = true;
+        validModify(false, false);
+        modifyFirstClick = false;
     }
 }
 
