@@ -141,7 +141,7 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
         } else {
             var offlineContext = context;
         }
-        
+
         if(typeof(audio_impulse_response) == "undefined" || audio_impulse_response == null) reverb = false;
         if(typeof(audio_modulator) == "undefined" || audio_modulator == null) vocode = false;
 
@@ -585,13 +585,13 @@ function loadAudioAPI(audio, dest) {
 
         request.onload = function() {
             checkAudioBuffer(dest);
-            
+
             context.decodeAudioData(request.response, function(data) {
                 window[dest] = data;
                 checkAudioBuffer(dest);
             });
         }
-        
+
         request.onreadystatechange = function() {
             checkAudioBuffer(dest);
         }
@@ -605,7 +605,7 @@ function loadAudioAPI(audio, dest) {
 
 function checkAudioBuffer(bufferName) {
     var errorText = "Une erreur est survenue lors du chargement de certaines données. Cette fonctionnalité est donc indisponible. Essayez de recharger la page (F5).";
-    
+
     if ('AudioContext' in window && !audioContextNotSupported) {
         switch(bufferName) {
             case "audio_ah_buffer":
@@ -649,7 +649,7 @@ function initAudioAPI() {
 
 function init() {
     preloadImages(imgArray);
-    
+
     if(checkAudio == false) {
         document.getElementById("compa").style.display = "block";
         document.getElementById("compaInfo").innerHTML = "Votre navigateur ne supporte pas la lecture de fichiers audio. Vous n'entendrez pas le Ah de Denis Brogniart !";

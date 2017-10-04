@@ -26,6 +26,20 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 
 ## Journal des changements
 
+* Version 2.2 (4/10/2017) :
+    - Ajout d'une fonction Vocoder (voix robotisée) pour l'outil Modifier la voix ! ;
+    - Possibilité de pousser encore plus le pitch et la vitesse dans l'outil Modifier la voix (passé de 2 à 5 crans maximum) ;
+    - Corrections de bugs mineurs et améliorations diverses :
+        - Correction d'un bug en rapport avec la fonction Enregistrer dans l'outil Modifier la voix dans le cas où cette fonction n'est pas compatible avec le navigateur ;
+        - Correction d'un bug dans le cas où le son est désactivé ;
+        - Correction d'un bug de l'outil Modifier la voix dans le cas où un traitement est en cours et que la case à cocher Activer le mode de compatibilité est cochée/décochée pendant ce temps ;
+        - Une vérification est faite pour détecter si les fichiers audio ont correctement été chargés ou non. Dans ce cas, certaines fonctionnalités peuvent être indisponibles ;
+        - Les infobulles ont été changées ;
+        - Mise à jour de certaines bibliothèques logicielles ;
+        - Ajout des avis de licence dans chaque fichier source du programme ;
+        - Nettoyage et simplification du code.
+    - A venir : un outil à part qui reprendra une grande partie du code de l'outil Modifier la voix de ce programme avec la possibilité de modifier des fichiers audio ou encore d'enregistrer sa voix via un microphone connecté à l'ordinateur et de la modifier en temps réel avec des effets.
+
 * Version 2.1 (1/10/2017) :
     - Possibilité d'enregistrer la voix modifiée sous la forme d'un fichier audio au format wav ;
     - Amélioration des performances de la fonction Modifier la voix, la voix modifiée est mise en cache avant d'être jouée (uniquement lorsque le mode de compatibilité est désactivé) ;
