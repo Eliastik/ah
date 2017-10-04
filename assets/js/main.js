@@ -388,14 +388,14 @@ function setTooltip(element, text, disable, enable,  otherElement, byId) {
     if(text !== "" && text !== null) {
         if(otherElement !== null) {
             otherElement.setAttribute("data-original-title", text);
-            new Tooltip(otherElement, {
+            window[otherElement + "_tooltip"] = new Tooltip(otherElement, {
                 placement: 'bottom',
                 animation: 'fade',
                 delay: 50,
             });
         } else {
             element.setAttribute("data-original-title", text);
-            new Tooltip(element, {
+            window[element + "_tooltip"] = new Tooltip(element, {
                 placement: 'bottom',
                 animation: 'fade',
                 delay: 50,
@@ -403,11 +403,12 @@ function setTooltip(element, text, disable, enable,  otherElement, byId) {
         }
     } else {
         if(otherElement !== null) {
-            otherElement.setAttribute("data-original-title", "");
-            //if(typeof(Tooltip(otherElement).hide) !== "undefined") Tooltip(otherElement, null).hide();
+            otherElement.removeAttribute("data-original-title");
+            console.log(window[otherElement + "_tooltip"]);
+            if(window[otherElement + "_tooltip"] && typeof(window[otherElement + "_tooltip"].hide) !== "undefined") window[otherElement + "_tooltip"].hide();
         } else {
-            element.setAttribute("data-original-title", "");
-            //if(typeof(Tooltip(element).hide) !== "undefined") Tooltip(element, null).hide();
+            element.removeAttribute("data-original-title");
+            if(window[element + "_tooltip"] && typeof(window[element + "_tooltip"].hide) !== "undefined") window[element + "_tooltip"].hide();
         }
     }
 
