@@ -404,7 +404,6 @@ function setTooltip(element, text, disable, enable,  otherElement, byId) {
     } else {
         if(otherElement !== null) {
             otherElement.removeAttribute("data-original-title");
-            console.log(window[otherElement + "_tooltip"]);
             if(window[otherElement + "_tooltip"] && typeof(window[otherElement + "_tooltip"].hide) !== "undefined") window[otherElement + "_tooltip"].hide();
         } else {
             element.removeAttribute("data-original-title");
