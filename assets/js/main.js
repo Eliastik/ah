@@ -1,4 +1,5 @@
 // Pure JS. No Jquery.
+// Default variables
 var nb_ah = 0;
 var timeout = 0;
 var interval = 0;
@@ -9,28 +10,30 @@ var playFromAPI = false;
 var compaAudioAPI = false;
 var vocoderAudio = false;
 var compatModeChecked = false;
-var img_ah_src = "assets/img/ah.gif";
 document.getElementById("checkFull").checked = false;
 var repetitionInterval = 500;
 var imgArray = ['assets/img/ah.gif', 'assets/img/ah_full.gif'];
+var img_ah_src = imgArray[0];
 var audioArray = ['assets/sounds/ah.mp3', 'assets/sounds/impulse_response.mp3', 'assets/sounds/modulator.mp3'];
+var audio_ah_buffer, audio_impulse_response, audio_modulator = null;
 var audioContextNotSupported = false;
+var modifyFirstClick = true;
 if('AudioContext' in window) {
 	try {
 		var AudioContext = window.AudioContext || window.webkitAudioContext;
 		var context = new AudioContext();
 	} catch(e) {
 		if(typeof(window.console.error) !== 'undefined') {
-			console.error("Error when creating Audio Context (seem to be unsupported):", e);
+			console.error("Error when creating Audio Context (the Web Audio API seem to be unsupported):", e);
 		} else {
-			console.log("Error when creating Audio Context (seem to be unsupported):", e);
+			console.log("Error when creating Audio Context (the Web Audio API seem to be unsupported):", e);
 		}
 		var audioContextNotSupported = true;
 	}
 } else {
 	var audioContextNotSupported = true;
 }
-var modifyFirstClick = true;
+// End of the default variables
 
 var slider = new Slider('#pitchRange', {
     formatter: function(value) {
@@ -62,10 +65,10 @@ var checkAudio = checkAudio("audio/mp3");
 
 function full() {
     if(document.getElementById("checkFull").checked == true) {
-        img_ah_src = "assets/img/ah_full.gif";
+        img_ah_src = imgArray[1];
         img_ah_type = 2;
     } else {
-        img_ah_src = "assets/img/ah.gif";
+        img_ah_src = imgArray[0];
         img_ah_type = 1;
     }
     
@@ -90,7 +93,7 @@ function compaMode() {
             document.getElementById("saveInputModify").setAttribute("title", "");
         } else {
             document.getElementById("saveInputModify").disabled = true;
-            document.getElementById("saveInputModify").setAttribute("title", "Désolé, votre navigateur est incompatible avec cette fonction.");
+            document.getElementById("saveInputModify").setAttribute("title", "Désolé, cette fonction est incompatible avec votre navigateur.");
         }
     }
 }
@@ -120,6 +123,10 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
             var offlineContext = context;
         }
         
+        document.getElementById("processingModifLoader").style.display = "block";
+        document.getElementById("validInputModify").disabled = true;
+        document.getElementById("saveInputModify").disabled = true;
+        
         function renderAudio(buffer) {
             var st = new soundtouch.SoundTouch(44100);
             st.pitch = pitch;
@@ -148,8 +155,10 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
                         document.getElementById("saveInputModify").setAttribute("title", "");
                     } else {
                         document.getElementById("saveInputModify").disabled = true;
-                        document.getElementById("saveInputModify").setAttribute("title", "Désolé, votre navigateur est incompatible avec cette fonction.");
+                        document.getElementById("saveInputModify").setAttribute("title", "Désolé, cette fonction est incompatible avec votre navigateur.");
                     }
+        
+                    document.getElementById("processingModifLoader").style.display = "none";
                     
                     if(!compatModeChecked) {
                         var sum = e.renderedBuffer.getChannelData(0).reduce(add, 0);
@@ -180,6 +189,8 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
             
                 document.getElementById("modify").disabled = false;
                 document.getElementById("validInputModify").disabled = false;
+                document.getElementById("processingModifLoader").style.display = "none";
+                
                 if(play && checkAudio && playFromAPI) {
                     if(reverb) {
                         convolver.buffer = audio_impulse_response;
@@ -359,8 +370,6 @@ function validModify(play, save) {
         if(document.getElementById("checkReverb").checked == true) reverbAudio = true; else reverbAudio = false;
         if(document.getElementById("checkCompa").checked == true) compaAudioAPI = true; else compaAudioAPI = false;
         if(document.getElementById("checkVocode").checked == true) vocoderAudio = true; else vocoderAudio = false;
-        document.getElementById("validInputModify").disabled = true;
-        document.getElementById("saveInputModify").disabled = true;
         if(compaAudioAPI) {
             if(checkAudio !== true || play !== true) {
                 document.getElementById("modify").disabled = false;
@@ -544,7 +553,7 @@ function endInit() {
         document.getElementById("modify").setAttribute("title", "");
     } else {
         document.getElementById("modify").disabled = true;
-        document.getElementById("modify").setAttribute("title", "Désolé, votre navigateur est incompatible avec cette fonction.");
+        document.getElementById("modify").setAttribute("title", "Désolé, cette fonction est incompatible avec votre navigateur.");
     }
     
     if (typeof(Worker) !== "undefined") {
@@ -552,7 +561,7 @@ function endInit() {
         document.getElementById("saveInputModify").setAttribute("title", "");
     } else {
         document.getElementById("saveInputModify").disabled = true;
-        document.getElementById("saveInputModify").setAttribute("title", "Désolé, votre navigateur est incompatible avec cette fonction.");
+        document.getElementById("saveInputModify").setAttribute("title", "Désolé, cette fonction est incompatible avec votre navigateur.");
     }
     
     stopSound();

@@ -53,6 +53,9 @@
                         <div class="row">
                             <div class="col-lg-6 col-sm-6 col-md-6" id="formModify">
                                 <div class="form-group">
+                                    <div class="input-group mb big" id="processingModifLoader">
+                                        <i class="fa fa-refresh fa-spin fa-fw"></i> <span class="bold">Traitement en cours… Veuillez patienter.</span>
+                                    </div>
                                     <label for="pitchRange"><i class="fa fa-microphone" aria-hidden="true"></i> Pitch (hauteur de la voix) :</label>
                                     <div class="input-group">
                                          <span class="slider-label left">Grave</span> <input type="text" name="pitchRange" id="pitchRange" data-provide="slider" data-slider-min="0.1" data-slider-max="2" data-slider-step="0.1" data-slider-value="1" data-slider-tooltip="show"> <span class="slider-label right">Aigu</span>
@@ -69,7 +72,7 @@
                                     </div>
                                     <div class="input-group checkbox">
                                         <input type="checkbox" id="checkCompa" onclick="compaMode();" /> <label for="checkCompa">Mode de compatibilité (cocher si aucun son n'est diffusé)</label><br />
-                                        <span class="small ml" id="compatAutoDetected">Détecté automatiquement</span>
+                                        <span class="small ml" id="compatAutoDetected">Détecté et activé automatiquement</span>
                                     </div>
                                     <div class="input-group mt">
                                         <button class="btn btn-primary" type="button" id="validInputModify" onclick="validModify(true, false);"><i class="fa fa-check" aria-hidden="true"></i> Valider</button>
