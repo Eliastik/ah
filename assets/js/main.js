@@ -200,6 +200,8 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
                         node.connect(offlineContext.destination);
                     }
                 }
+                
+                reloadAnimation(); // reload the animation
             }
         }
         
@@ -388,30 +390,34 @@ function validModify(play, save) {
     return false;
 }
 
+function reloadAnimation() {
+    nb_ah = nb_ah + 1;
+    document.getElementById("ah_img").src = "#";
+    document.getElementById("ah_img").src = img_ah_src;
+    document.getElementById("ah_img").title = "Cliquez ici !";
+    document.getElementById("nb_ah").innerHTML = nb_ah;
+}
+
 function ah() {
     if(checkAudio && playFromAPI == false) {
         var ah = new Audio();
         ah.src = audioArray[0];
     }
-    
-    nb_ah = nb_ah + 1;
-    document.getElementById("ah_img").src = "#";
-    document.getElementById("ah_img").src = img_ah_src;
-    document.getElementById("ah_img").title = "Cliquez ici !";
 
     if(checkAudio && !'AudioContext' in window && !audioContextNotSupported) {
         ah.play();
+        reloadAnimation();
     } else if(checkAudio && 'AudioContext' in window && !audioContextNotSupported && playFromAPI) {
         if(!compaAudioAPI) {
             playBufferAudioAPI(audio_ah_processed);
+            reloadAnimation();
         } else {
             renderAudioAPI(audio_ah_buffer, speedAudio, pitchAudio, reverbAudio, false, true, "audio_ah_processed", compaAudioAPI, vocoderAudio);
         }
     } else if(checkAudio && playFromAPI == false) {
         ah.play();
+        reloadAnimation();
     }
-
-    document.getElementById("nb_ah").innerHTML = nb_ah;
 }
 
 function preloadImages(array) {
