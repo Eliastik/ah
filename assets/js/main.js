@@ -141,6 +141,9 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
         } else {
             var offlineContext = context;
         }
+        
+        if(typeof(audio_impulse_response) == "undefined" || audio_impulse_response == null) reverb = false;
+        if(typeof(audio_modulator) == "undefined" || audio_modulator == null) vocode = false;
 
         document.getElementById("processingModifLoader").style.display = "block";
         document.getElementById("validInputModify").disabled = true;
@@ -616,10 +619,30 @@ function endInit() {
     document.getElementById("loading").style.display = "none";
 
     if ('AudioContext' in window && !audioContextNotSupported) {
-        if(typeof(audio_ah_buffer) == "undefined") {
+        if(typeof(audio_ah_buffer) == "undefined" || audio_ah_buffer == null) {
             setTooltip("modify", "Une erreur est survenue lors du chargement de certaines données. Cette fonctionnalité est donc indisponible. Essayez de recharger cette page (F5).", true, false, "wrapperModify", true);
         } else {
             setTooltip("modify", "", false, true, "wrapperModify", true);
+        }
+        
+        if(typeof(audio_impulse_response) == "undefined" || audio_impulse_response == null) {
+            setTooltip("checkReverb", "Une erreur est survenue lors du chargement de certaines données. Cette fonctionnalité est donc indisponible. Essayez de recharger cette page (F5).", true, false, "checkReverbWrapper", true);
+            document.getElementById("checkReverb").checked = false;
+            document.getElementById("checkReverbGroup").setAttribute("class", "input-group checkbox disabled");
+        } else {
+            setTooltip("checkReverb", "", false, true, "checkReverbWrapper", true);
+            document.getElementById("checkReverb").checked = false;
+            document.getElementById("checkReverbGroup").setAttribute("class", "input-group checkbox");
+        }
+        
+        if(typeof(audio_modulator) == "undefined" || audio_modulator == null) {
+            setTooltip("checkVocode", "Une erreur est survenue lors du chargement de certaines données. Cette fonctionnalité est donc indisponible. Essayez de recharger cette page (F5).", true, false, "checkVocodeWrapper", true);
+            document.getElementById("checkVocode").checked = false;
+            document.getElementById("checkVocodeGroup").setAttribute("class", "input-group checkbox disabled");
+        } else {
+            setTooltip("checkVocode", "", false, true, "checkVocodeWrapper", true);
+            document.getElementById("checkVocode").checked = false;
+            document.getElementById("checkVocodeGroup").setAttribute("class", "input-group checkbox");
         }
     } else {
         setTooltip("modify", "Désolé, cette fonction est incompatible avec votre navigateur.", true, false, "wrapperModify", true);

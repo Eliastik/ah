@@ -8,7 +8,7 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 
 ## À propos du programme
 
-* Version du programme : 2.1 REV1 (1/10/2017)
+* Version du programme : 2.2 (4/10/2017)
 * Made in France by Eliastik - [eliastiksofts.com](http://eliastiksofts.com) - Contact : [eliastiksofts.com/contact](http://eliastiksofts.com/contact)
 * Licence : GNU GPLv3 ([https://github.com/Eliastik/ah/blob/master/LICENCE.txt](https://github.com/Eliastik/ah/blob/master/LICENCE.txt))
 
@@ -88,13 +88,7 @@ Les navigateurs suivants sont partiellement compatibles :
 
 Pour pouvoir utiliser la fonction &laquo; Modifier la voix &raquo;, il vous faut un navigateur relativement récent (les dernières versions des navigateurs ci-dessus sont usuellement compatibles avec cette fonction, sauf Internet Explorer).
 
-Il n'est pas encore possible d'enregistrer les voix modifiées avec Firefox ou Edge pour l'instant, à cause d'un [bug de ce navigateur](https://bugzilla.mozilla.org/show_bug.cgi?id=1031851).
-
-## To-do list :
-
-To-do uniquement si possible :
-
-* Vérifier la compatibilité avec les futures versions de Firefox (bug).
+Il n'est pas encore possible d'enregistrer les voix modifiées avec Firefox ou Edge pour l'instant, à cause d'un bug (par exemple [sur Firefox](https://bugzilla.mozilla.org/show_bug.cgi?id=1031851)).
 
 ## Déclaration de licence
 
