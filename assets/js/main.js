@@ -38,6 +38,7 @@ var audio_ah_buffer, audio_impulse_response, audio_modulator = null;
 var audioContextNotSupported = false;
 var modifyFirstClick = true;
 var audioProcessing = false;
+var removedTooltipInfo = false;
 if('AudioContext' in window) {
     try {
         var AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -372,7 +373,7 @@ function validModify(play, save) {
     return false;
 }
 
-function setTooltip(element, text, disable, enable,  otherElement, byId) {
+function setTooltip(element, text, disable, enable,  otherElement, byId, display) {
     // Default parameters
     var element = element || null;
     var otherElement = otherElement || null;
@@ -380,6 +381,7 @@ function setTooltip(element, text, disable, enable,  otherElement, byId) {
     var disable = disable || false;
     var enable = enable || false;
     var byId = byId || false; // getElementById on element and otherElement
+    var display = display || false;
     // End of default parameters
 
     if(byId) {
@@ -389,6 +391,7 @@ function setTooltip(element, text, disable, enable,  otherElement, byId) {
 
     if(disable) element.disabled = true;
     if(enable) element.disabled = false;
+
     if(text !== "" && text !== null) {
         if(otherElement !== null) {
             otherElement.setAttribute("data-original-title", text);
@@ -397,6 +400,8 @@ function setTooltip(element, text, disable, enable,  otherElement, byId) {
                 animation: 'fade',
                 delay: 50,
             });
+
+            if(display) setTimeout(function() { window[otherElement + "_tooltip"].show() }, 150);
         } else {
             element.setAttribute("data-original-title", text);
             window[element + "_tooltip"] = new Tooltip(element, {
@@ -404,6 +409,8 @@ function setTooltip(element, text, disable, enable,  otherElement, byId) {
                 animation: 'fade',
                 delay: 50,
             });
+
+            if(display) setTimeout(function() { window[element + "_tooltip"].show() }, 150);
         }
     } else {
         if(otherElement !== null) {
@@ -415,15 +422,27 @@ function setTooltip(element, text, disable, enable,  otherElement, byId) {
         }
     }
 
-    return true;
+    if(otherElement !== null) {
+        if(window[otherElement + "_tooltip"] && typeof(window[otherElement + "_tooltip"].hide) !== "undefined") return window[otherElement + "_tooltip"];
+    } else {
+        if(window[element + "_tooltip"] && typeof(window[element + "_tooltip"].hide) !== "undefined") return window[element + "_tooltip"];
+    }
+
+    return null;
 }
 
 function reloadAnimation() {
     nb_ah = nb_ah + 1;
     document.getElementById("ah_img").src = "#";
     document.getElementById("ah_img").src = img_ah_src;
-    document.getElementById("ah_img").title = "Cliquez ici !";
     document.getElementById("nb_ah").innerHTML = nb_ah;
+}
+
+function removeTooltipInfo() {
+    if(!removedTooltipInfo) {
+        setTooltip("ah_img", "", false, true,  null, true, false);
+        removedTooltipInfo = true;
+    }
 }
 
 function ah() {
@@ -669,7 +688,7 @@ function endInit() {
     document.getElementById("checkFullDiv").setAttribute("class", "checkbox");
     document.getElementById("repeat").disabled = false;
     document.getElementById("stop").disabled = false;
-    document.getElementById("ah_img").setAttribute("onclick", "ah_click();");
+    document.getElementById("ah_img").setAttribute("onclick", "ah_click(); removeTooltipInfo();");
     document.getElementById("ah_img").style.display = "block";
     document.getElementById("loading").style.display = "none";
 
@@ -686,6 +705,8 @@ function endInit() {
     stopSound();
     compaMode();
     full();
+
+    setTooltip("ah_img", "Cliquez ici !", false, true,  null, true, true);
 }
 
 // When the page is entirely loaded, call the init function who load the others assets (images, sounds)
