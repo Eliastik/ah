@@ -239,6 +239,7 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
 
 function playBufferAudioAPI(buffer) {
     if ('AudioContext' in window && !audioContextNotSupported) {
+        context.resume();
         var source = context.createBufferSource();
         source.buffer = buffer;
         source.start(0);
