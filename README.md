@@ -8,7 +8,7 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 
 ## À propos du programme
 
-* Version du programme : 2.2 (4/10/2017)
+* Version du programme : 2.2.1 (15/05/2018)
 * Made in France by Eliastik - [eliastiksofts.com](http://eliastiksofts.com) - Contact : [eliastiksofts.com/contact](http://eliastiksofts.com/contact)
 * Licence : GNU GPLv3 ([https://github.com/Eliastik/ah/blob/master/LICENCE.txt](https://github.com/Eliastik/ah/blob/master/LICENCE.txt))
 
@@ -25,6 +25,11 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 * Le Ah de Denis Brogniart vient de cette vidéo : [https://www.youtube.com/watch?v=6oTsleGsWT8](https://www.youtube.com/watch?v=6oTsleGsWT8)
 
 ## Journal des changements
+
+* Version 2.2.1 (15/05/2018) :
+    - Correction d'un problème avec les nouvelles versions de Chrome et la fonction Modifier la voix qui ne fonctionnait plus (à cause des Autoplay Policies, voir : https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio ) ;
+    - Ajout d'une infobulle d'info "Cliquez ici !" ;
+    - Mise à jour de certaines bibliothèques logicielles et corrections mineures.
 
 * Version 2.2 (4/10/2017) :
     - Ajout d'une fonction Vocoder (voix robotisée) pour l'outil Modifier la voix ! ;
@@ -116,7 +121,7 @@ Vous devez avoir reçu une copie de la GNU General Public License en même temps
 
 ----
 
-Copyright (C) 2017 Eliastik (eliastiksofts.com)
+Copyright (C) 2017-2018 Eliastik (eliastiksofts.com)
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
