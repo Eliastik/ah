@@ -29,6 +29,7 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 * Version 2.2.2 (31/03/2019) :
     - Alignement du code avec celui de [La boîte à Emmanuel Macron](http://www.eliastiksofts.com/memes/macron/) afin de faciliter les développements futurs
         - Cela intègre la fusion des deux codes, La boîte à Emmanuel Macron intégrant un mode boîte à son et des corrections de bugs.
+    - Mise à jour des bibliothèques logicielles.
 
 * Version 2.2.1 (15/05/2018) :
     - Correction d'un problème avec les nouvelles versions de Chrome et la fonction Modifier la voix qui ne fonctionnait plus (à cause des Autoplay Policies, voir : https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio ) ;
