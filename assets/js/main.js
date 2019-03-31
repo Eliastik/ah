@@ -850,14 +850,14 @@ function checkAudioBuffer(bufferName) {
     if ('AudioContext' in window && !audioContextNotSupported) {
         switch(bufferName) {
             case "audio_principal_buffer":
-                if(typeof(audio_principal_buffer) == "undefined") {
+                if(typeof(audio_principal_buffer) == "undefined" || audio_principal_buffer == null) {
                     setTooltip("modify", errorText, true, false, "wrapperModify", true);
                 } else {
                     setTooltip("modify", "", false, true, "wrapperModify", true);
                 }
             break;
             case "audio_impulse_response":
-                if(typeof(audio_impulse_response) == "undefined") {
+                if(typeof(audio_impulse_response) == "undefined" || audio_impulse_response == null) {
                     setTooltip("checkReverb", errorText, true, false, "checkReverbWrapper", true);
                     document.getElementById("checkReverb").checked = false;
                     document.getElementById("checkReverbGroup").setAttribute("class", "input-group checkbox disabled");
@@ -868,7 +868,7 @@ function checkAudioBuffer(bufferName) {
                 }
             break;
             case "audio_modulator":
-                if(typeof(audio_modulator) == "undefined") {
+                if(typeof(audio_modulator) == "undefined" || audio_modulator == null) {
                     setTooltip("checkVocode", errorText, true, false, "checkVocodeWrapper", true);
                     document.getElementById("checkVocode").checked = false;
                     document.getElementById("checkVocodeGroup").setAttribute("class", "input-group checkbox disabled");
