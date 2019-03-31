@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Eliastik (eliastiksofts.com)
+ * Copyright (C) 2017-2019 Eliastik (eliastiksofts.com)
  *
  * This file is part of "Denis Brogniart – Ah !".
  *
@@ -22,6 +22,9 @@
 img {
     max-width: 100%;
     height: auto;
+}
+.form-group.nmb {
+    margin-bottom: 0;
 }
 #compa, #errorLoading, #formInterval, #ah_img, #formModify, #compatAutoDetected {
     display: none;
