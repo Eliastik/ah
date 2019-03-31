@@ -822,14 +822,18 @@ function loadAudioAPI(audio, dest, func) {
 
                 if(typeof func !== 'undefined') {
                     return func(true);
-                } else {
-                    return true;
                 }
             });
         }
 
         request.onreadystatechange = function() {
             checkAudioBuffer(dest);
+        }
+
+        request.onerror = function() {
+            if(typeof func !== 'undefined') {
+                return func(false);
+            }
         }
 
         request.send();
