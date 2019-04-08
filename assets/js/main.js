@@ -17,7 +17,6 @@
  * along with "Denis Brogniart – Ah !".  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 // Pure JS. No Jquery.
 // Default variables
 var nb_play, timeout, interval, avgDebitDownloadLastImage, speedAudio, pitchAudio, repetitionInterval, modifyFirstClick, reverbAudio, playFromAPI, compaAudioAPI, vocoderAudio, compatModeChecked, audioContextNotSupported, audioProcessing, removedTooltipInfo, firstInit, audio_principal_buffer, audio_impulse_response, audio_modulator, img_principal_type;
