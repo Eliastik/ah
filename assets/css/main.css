@@ -16,17 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with "Denis Brogniart – Ah !".  If not, see <http://www.gnu.org/licenses/>.
  */
-#ah_img, button, label {
+body {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+#animation_img, button, label {
     cursor: pointer;
 }
 img {
     max-width: 100%;
     height: auto;
 }
+.btn {
+    margin: 2px;
+}
+.input-group-btn .btn {
+    margin: 0;
+}
 .form-group.nmb {
     margin-bottom: 0;
 }
-#compa, #errorLoading, #formInterval, #ah_img, #formModify, #compatAutoDetected {
+#compa, #errorLoading, #formInterval, #animation_img, #formModify, #compatAutoDetected {
     display: none;
 }
 .mb {

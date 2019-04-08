@@ -40,10 +40,10 @@
             </div>
         </nav>
         <div class="container well">
-            <noscript><div class="alert alert-danger" id="noJS"><i class="fa fa-times-circle" aria-hidden="true"></i> Javascript est désactivé sur votre navigateur web. Cette application nécessite Javascript pour pouvoir fonctionner. <a href="https://www.enable-javascript.com/fr/" target="_blank">Cliquez ici pour savoir comment activer Javascript</a>.</div></noscript>
+            <noscript><div class="alert alert-danger" id="noJS"><i class="fa fa-times-circle fa-fw" aria-hidden="true"></i> Javascript est désactivé sur votre navigateur web. Cette application nécessite Javascript pour pouvoir fonctionner. <a href="https://www.enable-javascript.com/fr/" target="_blank">Cliquez ici pour savoir comment activer Javascript</a>.</div></noscript>
             <div class="alert alert-info" id="loading"><i class="fa fa-refresh fa-spin fa-fw"></i> <span id="loadingInfo">Chargement</span><br /><small id="timeLoadingInfo"></small></div>
-            <div class="alert alert-danger" id="errorLoading"><i class="fa fa-times-circle" aria-hidden="true"></i> Une erreur de connexion est survenue lors du chargement des données graphiques. Vérifiez votre connexion Internet puis <a href="#" onclick="location.reload();" class="link-contrasted-red">rechargez la page</a>.</div>
-            <div class="alert alert-warning" id="compa"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span id="compaInfo"></span></div>
+            <div class="alert alert-danger" id="errorLoading"><i class="fa fa-times-circle fa-fw" aria-hidden="true"></i> Une erreur de connexion est survenue lors du chargement de certaines données. Vérifiez votre connexion Internet puis <a href="#" onclick="reloadData();" class="link-contrasted-red">cliquez ici pour tenter de recharger les données</a>, ou <a href="#" onclick="location.reload();" class="link-contrasted-red">rechargez la page</a>.</div>
+            <div class="alert alert-warning" id="compa"><i class="fa fa-exclamation-triangle fa-fw" aria-hidden="true"></i> <span id="compaInfo"></span></div>
             <p id="description" class="lead">Le fameux Ah de Denis Brogniart (dans l'émission Koh-Lanta) ! Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois que vous voulez sur Denis pour qu'il dise Ah, ou faites le répéter en cliquant sur le bouton prévu pour cela. Vous pouvez aussi modifier sa voix !</p>
             <div class="mb" id="imgAnimationDiv"><img src="" id="animation_img" /></div>
             <div class="row"><div class="col-lg-3 col-sm-3 col-md-3"><ul class="list-group"><li class="list-group-item"><i class="fa fa-comment fa-fw" aria-hidden="true"></i> <span class="badge" id="nb_play">0</span> Ah prononcés</li></ul></div></div>
@@ -52,7 +52,7 @@
                     <form>
                         <div class="form-inline mb" id="formSoundChoice">
                             <div class="form-group">
-                                <label for="soundChoice"><i class="fa fa-volume-up" aria-hidden="true"></i> Son :</label>
+                                <label for="soundChoice"><i class="fa fa-volume-up fa-fw" aria-hidden="true"></i> Son :</label>
                                 <select class="form-control" id="soundChoice" disabled="disabled">
                                     <option value="0">Chargement…</option>
                                 </select>
@@ -68,11 +68,11 @@
                         <div class="row">
                             <div class="col-lg-4 col-sm-6 col-md-6" id="formInterval">
                                 <div class="form-group">
-                                    <label for="inputInterval"><i class="fa fa-clock-o" aria-hidden="true"></i> Intervalle de répétition (millisecondes) :</label>
+                                    <label for="inputInterval"><i class="fa fa-clock-o fa-fw" aria-hidden="true"></i> Intervalle de répétition (millisecondes) :</label>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="inputInterval" value="500" placeholder="Entrez l'intervalle (ex : 500)" />
+                                        <input type="number" class="form-control" id="inputInterval" value="500" min="10" max="2147483647" placeholder="Entrez l'intervalle (ex : 500)" />
                                         <span class="input-group-btn">
-                                            <button class="btn btn-default" type="button" id="validInputInterval" onclick="validInterval();"><i class="fa fa-check" aria-hidden="true"></i> Valider</button>
+                                            <button class="btn btn-default" type="button" id="validInputInterval" onclick="validInterval();"><i class="fa fa-check fa-fw" aria-hidden="true"></i> Valider</button>
                                         </span>
                                     </div>
                                 </div>
@@ -84,11 +84,11 @@
                                     <div class="input-group mb big" id="processingModifLoader">
                                         <i class="fa fa-refresh fa-spin fa-fw"></i> <span class="bold">Traitement en cours… Veuillez patienter.</span>
                                     </div>
-                                    <label for="pitchRange"><i class="fa fa-microphone" aria-hidden="true"></i> Pitch (hauteur de la voix) :</label>
+                                    <label for="pitchRange"><i class="fa fa-microphone fa-fw" aria-hidden="true"></i> Pitch (hauteur de la voix) :</label>
                                     <div class="input-group">
                                          <span class="slider-label left">Grave</span> <input type="text" name="pitchRange" id="pitchRange" data-provide="slider" data-slider-min="0.1" data-slider-max="5" data-slider-step="0.1" data-slider-value="1" data-slider-tooltip="show" data-slider-ticks="[0.1, 1, 2, 5]" data-slider-ticks-snap-bounds="0.1" ticks_positions="[0.1, 1, 2, 5]"> <span class="slider-label right">Aigu</span>
                                     </div>
-                                    <label for="speedRange"><i class="fa fa-forward" aria-hidden="true"></i> Vitesse :</label>
+                                    <label for="speedRange"><i class="fa fa-forward fa-fw" aria-hidden="true"></i> Vitesse :</label>
                                     <div class="input-group">
                                         <span class="slider-label left">Lent</span> <input type="text" name="speedRange" id="speedRange" data-provide="slider" data-slider-min="0.1" data-slider-max="5" data-slider-step="0.1" data-slider-value="1" data-slider-tooltip="show" data-slider-ticks="[0.1, 1, 2, 5]" data-slider-ticks-snap-bounds="0.1" ticks_positions="[0.1, 1, 2, 5]"> <span class="slider-label right">Rapide</span>
                                     </div>
@@ -103,10 +103,9 @@
                                         <span class="small ml" id="compatAutoDetected">Détecté et activé automatiquement</span>
                                     </div>
                                     <div class="input-group mt">
-                                        <button class="btn btn-primary" type="button" id="validInputModify" onclick="validModify(true, false);"><i class="fa fa-check" aria-hidden="true"></i> Valider</button>
-                                        &nbsp;
+                                        <button class="btn btn-primary" type="button" id="validInputModify" onclick="validModify(true, false);" disabled="disabled"><i class="fa fa-check fa-fw" aria-hidden="true"></i> Valider</button>
                                         <div class="disabled-button-wrapper" id="wrapperSave">
-                                            <button class="btn btn-default" type="button" id="saveInputModify" onclick="validModify(false, true);" disabled="disabled"><i class="fa fa-save" aria-hidden="true"></i> Enregistrer</button>
+                                            <button class="btn btn-default" type="button" id="saveInputModify" onclick="validModify(false, true);" disabled="disabled"><i class="fa fa-save fa-fw" aria-hidden="true"></i> Enregistrer</button>
                                         </div>
                                     </div>
                                 </div>

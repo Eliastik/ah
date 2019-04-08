@@ -19,9 +19,9 @@
 
 // Pure JS. No Jquery.
 // Default variables
-var nb_play, timeout, interval, avgDebitDownloadLastImage, speedAudio, pitchAudio, repetitionInterval, modifyFirstClick, reverbAudio, playFromAPI, compaAudioAPI, vocoderAudio, compatModeChecked, audioContextNotSupported, audioProcessing, removedTooltipInfo, firstInit, audio_principal_buffer, audio_impulse_response, audio_modulator, img_principal_type;
+var nb_play, timeout, interval, avgDebitDownloadLastImage, speedAudio, pitchAudio, repetitionInterval, modifyFirstClick, reverbAudio, playFromAPI, compaAudioAPI, vocoderAudio, compatModeChecked, audioContextNotSupported, audioProcessing, removedTooltipInfo, firstInit, audio_principal_buffer, audio_impulse_response, audio_modulator, img_principal_type, previousSound, errorSound;
 
-nb_play = timeout = interval = avgDebitDownloadLastImage = 0;
+nb_play = timeout = interval = avgDebitDownloadLastImage = previousSound = errorSound = 0;
 speedAudio = pitchAudio = img_principal_type = 1;
 repetitionInterval = 500;
 modifyFirstClick = true;
@@ -76,6 +76,12 @@ var slider2 = new Slider("#speedRange", {
     }
 });
 
+document.getElementById("inputInterval").onkeyup = function(e) {
+    if(e.keyCode === 13) {
+        validInterval();
+    }
+};
+
 function checkAudio(type) {
     if(!window.HTMLAudioElement) {
         return false;
@@ -111,24 +117,29 @@ function changeSound(index) {
         document.getElementById("soundChoice").disabled = "disabled";
 
         preloadImages(makeArrayForPreload(soundBoxList, 2, index, index + 1), makeArrayForPreload(soundBoxList, 3, index, index + 1), function(result) {
-            img_principal_src = soundBoxList[index][2];
-            audioFileName = soundBoxList[index][1];
-            audio_principal_buffer = null;
+            if(result) {
+                img_principal_src = soundBoxList[index][2];
+                audioFileName = soundBoxList[index][1];
+                audio_principal_buffer = null;
 
-            loadAudioAPI(audioFileName, "audio_principal_buffer", function(result) {
+                loadAudioAPI(audioFileName, "audio_principal_buffer", function(result2) {
+                    document.getElementById("loading").style.display = "none";
+                    document.getElementById("soundChoice").disabled = "";
+                    previousSound = index;
+
+                    if(playFromAPI) {
+                        validModify(true, false);
+                    } else {
+                        launchPlay();
+                        validModify(false, false);
+                    }
+                });
+            } else {
                 document.getElementById("loading").style.display = "none";
                 document.getElementById("soundChoice").disabled = "";
-
-                if(!checkAudio) {
-                    validModify(false, false);
-                }
-
-                if(playFromAPI) {
-                    validModify(true, false);
-                } else {
-                    launchPlay();
-                }
-            });
+                document.getElementById("soundChoice").value = previousSound;
+                errorSound = index;
+            }
         });
     }
 }
@@ -136,6 +147,11 @@ function changeSound(index) {
 document.getElementById("soundChoice").onchange = function() {
     changeSound(this.value);
 };
+
+function reloadData() {
+    initAudioAPI();
+    changeSound(errorSound);
+}
 
 var checkAudio = checkAudio("audio/mp3");
 
@@ -394,7 +410,9 @@ function validModify(play, save) {
         return false;
     }
 
-    playFromAPI = true;
+    if(play) {
+        playFromAPI = true;
+    }
 
     if(isNaN(tmp_pitch) || tmp_pitch == "" || tmp_pitch <= 0 || tmp_pitch > 5) {
         alert("Valeur du pitch invalide !");
@@ -412,6 +430,7 @@ function validModify(play, save) {
         if(document.getElementById("checkReverb").checked == true) reverbAudio = true; else reverbAudio = false;
         if(document.getElementById("checkCompa").checked == true) compaAudioAPI = true; else compaAudioAPI = false;
         if(document.getElementById("checkVocode").checked == true) vocoderAudio = true; else vocoderAudio = false;
+
         if(compaAudioAPI) {
             if(checkAudio !== true || play !== true) {
                 document.getElementById("modify").disabled = false;
@@ -425,6 +444,7 @@ function validModify(play, save) {
         } else {
             renderAudioAPI(audio_principal_buffer, speedAudio, pitchAudio, reverbAudio, save, play, "audio_principal_processed", compaAudioAPI, vocoderAudio);
         }
+
         return true;
     }
 
@@ -577,7 +597,7 @@ function autoConvertOctets(size) { // debit en octets/secondes
 
 function timeRemaining(size, debit) {
     if(!isNaN(size) && !isNaN(debit)) {
-        return "Temps restant estimé : <span id='timerDownloadTime'>" + Math.round((size / debit)) + "</span> secondes (débit moyen : " + autoConvertOctets(debit) + "/s) – Taille des données : " + autoConvertOctets(size);
+        return "Temps restant estimé : <span id='timerDownloadTime'>" + Math.round((size / debit)) + "</span> seconde(s) (débit moyen : " + autoConvertOctets(debit) + "/s) – Taille des données : " + autoConvertOctets(size);
     }
 
     return "";
@@ -729,15 +749,18 @@ function preloadAudios(array, func) {
 
             var loadedAudioCount = 0;
             var errorLoadingAudio = false;
-            var pourcentageLoadingAudio = 0;
             var audioFiles = array;
             var audioFilesLoaded = [];
 
             var errorLoadingAudioFunction = function() {
                 if(audioFilesLoaded.indexOf(this.src) == -1) {
-                    loadedAudioCount++;
                     var errorLoadingAudio = true;
+
+                    loadedAudioCount++;
                     document.getElementById("loadingInfo").innerHTML = msgLoading + loadedAudioCount + "/" + array.length;
+                    document.getElementById("errorLoading").style.display = "block";
+
+                    audioFilesLoaded.push(this.src);
 
                     if(loadedAudioCount >= audioFiles.length) {
                         if(typeof func !== 'undefined') {
@@ -746,8 +769,6 @@ function preloadAudios(array, func) {
                             return false;
                         }
                     }
-
-                    audioFilesLoaded.push(this.src);
                 }
             };
 
@@ -761,34 +782,30 @@ function preloadAudios(array, func) {
                 }
             }, 5000);
 
-            for(var i in audioFiles) {
-                (function() {
-                    var audioPreload = new Audio();
-                    audioPreload.src = audioFiles[i];
-                    audioPreload.preload = "auto";
+            for(var i = 0; i < audioFiles.length; i++) {
+                var audioPreload = new Audio();
+                audioPreload.src = audioFiles[i];
+                audioPreload.preload = "auto";
 
-                    audioPreload.oncanplaythrough = function() {
-                        if(audioFilesLoaded.indexOf(this.src) == -1) {
-                            loadedAudioCount++;
-                            var pourcentageLoadingAudio = Math.round((100*loadedAudioCount)/audioFiles.length);
-                            document.getElementById("loadingInfo").innerHTML = msgLoading + loadedAudioCount + "/" + array.length;
+                audioPreload.oncanplaythrough = function() {
+                    if(audioFilesLoaded.indexOf(this.src) == -1) {
+                        loadedAudioCount++;
+                        document.getElementById("loadingInfo").innerHTML = msgLoading + loadedAudioCount + "/" + array.length;
 
-                            if(loadedAudioCount >= audioFiles.length) {
-                                if(typeof func !== 'undefined') {
-                                    return func(true);
-                                } else {
-                                    return true;
-                                }
+                        audioFilesLoaded.push(this.src);
+
+                        if(loadedAudioCount >= audioFiles.length) {
+                            if(typeof func !== 'undefined') {
+                                return func(true);
+                            } else {
+                                return true;
                             }
-
-                            audioFilesLoaded.push(this.src);
                         }
-                    };
+                    }
+                };
 
-                    audioPreload.onerror = errorLoadingAudioFunction;
-                    audioPreload.onsuspend = errorLoadingAudioFunction;
-                    audioPreload.onabort = errorLoadingAudioFunction;
-                }());
+                audioPreload.onerror = errorLoadingAudioFunction;
+                audioPreload.onstalled = errorLoadingAudioFunction;
             }
         } else {
             if(typeof func !== 'undefined') {
@@ -904,7 +921,7 @@ function init(func) {
     }
 
     preloadImages(makeArrayForPreload(imgArray, 0, 0, imgArray.length), makeArrayForPreload(imgArray, 1, 0, imgArray.length), function(result) {
-        preloadAudios(audioArray, function() {
+        preloadAudios(audioArray, function(result2) {
             if(!firstInit) {
                 firstInit = true;
                 initAudioAPI();
@@ -951,7 +968,7 @@ function init(func) {
         document.getElementById("compaInfo").innerHTML = "Votre navigateur ne supporte pas la lecture de fichiers audio. Vous n'entendrez rien !";
     } else if(checkAudio == "no mp3 support") {
         document.getElementById("compa").style.display = "block";
-        document.getElementById("compaInfo").innerHTML = "Votre navigateur supporte la lecture de fichiers audio, mais il ne peut pas lire le format MP3. Vous n'entendrez pas rien !";
+        document.getElementById("compaInfo").innerHTML = "Votre navigateur supporte la lecture de fichiers audio, mais il ne peut pas lire le format MP3. Vous n'entendrez rien !";
     } else {
         document.getElementById("checkSound").disabled = false;
         document.getElementById("checkSound").checked = false;
