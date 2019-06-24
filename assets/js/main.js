@@ -28,21 +28,6 @@ modifyFirstClick = true;
 reverbAudio = playFromAPI = compaAudioAPI = vocoderAudio = compatModeChecked = audioContextNotSupported = audioProcessing = removedTooltipInfo = firstInit = false;
 audio_principal_buffer = audio_impulse_response = audio_modulator = null;
 
-// Settings
-var filesDownloadName = "ah";
-var checkFullEnabled = true;
-var checkFullImg = ["assets/img/ah.gif", "assets/img/ah_full.gif"];
-var imgArray = [
-    ["assets/img/ah.gif", 365961],
-    ["assets/img/ah_full.gif", 1821614]
-]; // images to be loaded when launching the app + size
-var audioArray = ["assets/sounds/ah.mp3", "assets/sounds/impulse_response.mp3", "assets/sounds/modulator.mp3"]; // audio to be loaded when launching the app
-
-var soundBoxList = [ // sound name - path to the sound - path to the animation - size of the animation (bytes)
-    ["Ah !", "assets/sounds/ah.mp3", "assets/img/ah.gif", 365961]
-];
-// End of the settings
-
 var audioFileName = soundBoxList[0][1];
 var img_principal_src = soundBoxList[0][2];
 
@@ -179,20 +164,25 @@ function stopSound() {
 
 function compaMode() {
     if(!audioProcessing) {
-        if(document.getElementById("checkCompa").checked == true) {
-            setTooltip("saveInputModify", "Non disponible en mode de compatibilité.", true, false, "wrapperSave", true);
+        if (typeof(Worker) !== "undefined" && Worker != null) {
+            setTooltip("saveInputModify", null, false, true, "wrapperSave", true);
         } else {
-            if (typeof(Worker) !== "undefined") {
-                setTooltip("saveInputModify", null, false, true, "wrapperSave", true);
-            } else {
-                setTooltip("saveInputModify", "Désolé, cette fonction est incompatible avec votre navigateur.", true, false, "wrapperSave", true);
-            }
+            setTooltip("saveInputModify", "Désolé, cette fonction est incompatible avec votre navigateur.", true, false, "wrapperSave", true);
         }
     }
 }
 
 function add(a, b) {
     return a + b;
+}
+
+function calcAudioDuration(audio, speed, pitch, reverb, vocode) {
+    var duration = audio.duration + 1;
+
+    duration = duration / parseFloat(speed);
+    if(reverb) duration = duration + 5;
+
+    return duration;
 }
 
 function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp, vocode, rate, BUFFER_SIZE) {
@@ -210,8 +200,10 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
     // End of default parameters
 
     if ('AudioContext' in window && !audioContextNotSupported) {
+        var durationAudio = calcAudioDuration(audio, speed, pitch, reverb, vocode);
+
         if(!comp) {
-            var offlineContext = new OfflineAudioContext(2, context.sampleRate*15, context.sampleRate);
+            var offlineContext = new OfflineAudioContext(2, context.sampleRate * durationAudio, context.sampleRate);
         } else {
             var offlineContext = context;
         }
@@ -274,32 +266,71 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
 
                 offlineContext.startRendering();
             } else {
-                document.getElementById("modify").disabled = false;
-                document.getElementById("validInputModify").disabled = false;
-                document.getElementById("processingModifLoader").style.display = "none";
-                audioProcessing = false;
-                compaMode();
+                if(!save) {
+                    document.getElementById("modify").disabled = false;
+                    document.getElementById("validInputModify").disabled = false;
+                    document.getElementById("processingModifLoader").style.display = "none";
+                    audioProcessing = false;
+                    compaMode();
+                } else {
+                    document.getElementById("processingModifLoader").style.display = "none";
+                    document.getElementById("processingSave").style.display = "block";
+                }
 
-                if(play && checkAudio && playFromAPI) {
-                    if(reverb) {
-                        convolver.buffer = audio_impulse_response;
-                        node.connect(convolver);
+                if(reverb) {
+                    convolver.buffer = audio_impulse_response;
+                    node.connect(convolver);
+
+                    if(play) {
                         convolver.connect(offlineContext.destination);
-                    } else {
+
+                         if(save) {
+                            var rec = new Recorder(convolver, { workerPath: "assets/js/recorderWorker.js" });
+                        }
+                    }
+                } else {
+                    if(play) {
                         node.connect(offlineContext.destination);
+
+                         if(save) {
+                            var rec = new Recorder(node, { workerPath: "assets/js/recorderWorker.js" });
+                        }
                     }
                 }
 
-                reloadAnimation(); // reload the animation
+                if(play || save) {
+                  reloadAnimation();
+                }
+
+                if(play && save) {
+                    rec.record();
+
+                    setTimeout(function() {
+                        rec.stop();
+
+                        rec.exportWAV(function(blob) {
+                            downloadAudioBlob(blob);
+
+                            document.getElementById("modify").disabled = false;
+                            document.getElementById("validInputModify").disabled = false;
+                            document.getElementById("processingSave").style.display = "none";
+                            audioProcessing = false;
+                            compaMode();
+                        });
+                    }, durationAudio * 1000);
+                }
             }
         }
 
         if(reverb) var convolver = offlineContext.createConvolver();
+
         if(vocode) {
-            var offlineContext2 = new OfflineAudioContext(2, context.sampleRate*15, context.sampleRate);
+            var offlineContext2 = new OfflineAudioContext(2, context.sampleRate * durationAudio, context.sampleRate);
+
             offlineContext2.oncomplete = function(e) {
                 renderAudio(e.renderedBuffer);
             };
+
             vocoder(offlineContext2, audio_modulator, audio);
             offlineContext2.startRendering();
         } else {
@@ -311,22 +342,29 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
     }
 }
 
-function playBufferAudioAPI(buffer) {
-    if ('AudioContext' in window && !audioContextNotSupported) {
+function playBufferAudioAPI(audio) {
+    this.buffer = audio;
+    this.source;
+    this.interval;
+
+    this.init = function() {
         context.resume();
-        var source = context.createBufferSource();
-        source.buffer = buffer;
-        source.start(0);
-        source.connect(context.destination);
-    } else {
-        if(typeof(window.console.error) !== 'undefined') console.error("Web Audio API not supported by this browser.");
-        return false;
-    }
+        this.source = context.createBufferSource();
+        this.source.buffer = audio;
+        this.source.connect(context.destination);
+    };
+
+    this.stop = function() {
+        this.source.stop(0);
+    };
+
+    this.start = function() {
+        this.source.start(0);
+    };
 }
 
-/* https://stackoverflow.com/questions/22560413/html5-web-audio-convert-audio-buffer-into-wav-file */
 function saveBuffer(buffer) {
-    if (typeof(Worker) !== "undefined") {
+    if(typeof(Worker) !== "undefined" && Worker != null) {
         var worker = new Worker("assets/js/recorderWorker.js");
     } else {
         if(typeof(window.console.error) !== 'undefined') console.error("Workers are not supported by this browser.");
@@ -343,15 +381,7 @@ function saveBuffer(buffer) {
         });
 
         worker.onmessage = function(e) {
-            var blob = e.data;
-            var a = document.createElement("a");
-            var url = URL.createObjectURL(blob);
-            document.body.appendChild(a);
-            a.style = "display: none";
-            a.href = url;
-            a.download = filesDownloadName + "-" + new Date().toISOString() + ".wav";
-            a.click();
-            window.URL.revokeObjectURL(url);
+            downloadAudioBlob(e.data);
         };
 
         worker.postMessage({
@@ -371,6 +401,18 @@ function saveBuffer(buffer) {
         if(typeof(window.console.error) !== 'undefined') console.error("Web Audio API not supported by this browser.");
         return false;
     }
+}
+
+function downloadAudioBlob(e) {
+    var blob = e;
+    var a = document.createElement("a");
+    var url = URL.createObjectURL(blob);
+    document.body.appendChild(a);
+    a.style = "display: none";
+    a.href = url;
+    a.download = filesDownloadName + "-" + new Date().toISOString() + ".wav";
+    a.click();
+    window.URL.revokeObjectURL(url);
 }
 
 function validInterval() {
@@ -534,7 +576,9 @@ function launchPlay() {
         reloadAnimation();
     } else if(checkAudio && 'AudioContext' in window && !audioContextNotSupported && playFromAPI) {
         if(!compaAudioAPI) {
-            playBufferAudioAPI(audio_principal_processed);
+            var player = new playBufferAudioAPI(audio_principal_processed);
+            player.init();
+            player.start();
             reloadAnimation();
         } else {
             renderAudioAPI(audio_principal_buffer, speedAudio, pitchAudio, reverbAudio, false, true, "audio_principal_processed", compaAudioAPI, vocoderAudio);
@@ -581,6 +625,45 @@ function launchPlay_modify() {
         validModify(false, false);
         modifyFirstClick = false;
     }
+}
+
+function launchSave() {
+    if(!audioProcessing && typeof(audio_principal_processed) !== "undefined" && audio_principal_processed != null && !compaAudioAPI) {
+        validModify(false, true);
+    } else if(compaAudioAPI) {
+        renderAudioAPI(audio_principal_buffer, speedAudio, pitchAudio, reverbAudio, true, true, "audio_principal_processed", compaAudioAPI, vocoderAudio);
+    }
+}
+
+function resetModify() {
+    document.getElementById("checkReverb").checked = false;
+    document.getElementById("checkVocode").checked = false;
+    slider.setValue(1.0);
+    slider2.setValue(1.0);
+}
+
+function randomRange(min, max) {
+    return ((Math.random() * max) + min).toFixed(1);
+}
+
+function randomBool() {
+    return Math.round(Math.random()) == 0 ? false : true;
+}
+
+function randomModify() {
+    var checkReverb = document.getElementById("checkReverb");
+    var checkVocode = document.getElementById("checkVocode");
+
+    if(!checkReverb.disabled) {
+        checkReverb.checked = randomBool();
+    }
+
+    if(!checkVocode.disabled) {
+        checkVocode.checked = randomBool();
+    }
+
+    slider.setValue(randomRange(0.1, 5.0));
+    slider2.setValue(randomRange(0.1, 5.0));
 }
 
 function autoConvertOctets(size) { // debit en octets/secondes
@@ -903,9 +986,15 @@ function checkAudioBuffer(bufferName) {
 }
 
 function initAudioAPI() {
-    loadAudioAPI(audioFileName, "audio_principal_buffer");
-    loadAudioAPI(audioArray[1], "audio_impulse_response");
-    loadAudioAPI(audioArray[2], "audio_modulator");
+  loadAudioAPI(audioFileName, "audio_principal_buffer", function() {
+    loadAudioAPI(audioArray[1], "audio_impulse_response", function() {
+      loadAudioAPI(audioArray[2], "audio_modulator", function() {
+        if(typeof(audio_impulse_response) == "undefined" || audio_impulse_response == null || typeof(audio_modulator) == "undefined" || audio_modulator == null) {
+          document.getElementById("errorLoading").style.display = "block";
+        }
+      });
+    });
+  });
 }
 
 function init(func) {
@@ -978,7 +1067,7 @@ function init(func) {
 
 // When the page is entirely loaded, call the init function who load the others assets (images, sounds)
 document.onreadystatechange = function() {
-    if (document.readyState === 'complete') {
+    if(document.readyState === 'complete') {
         init();
     }
 };

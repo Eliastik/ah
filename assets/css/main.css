@@ -38,7 +38,7 @@ img {
 .form-group.nmb {
     margin-bottom: 0;
 }
-#compa, #errorLoading, #formInterval, #animation_img, #formModify, #compatAutoDetected {
+#compa, #errorLoading, #formInterval, #animation_img, #formModify, #compatAutoDetected, #processingSave {
     display: none;
 }
 .mb {
