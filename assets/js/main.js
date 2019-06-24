@@ -25,7 +25,7 @@ nb_play = timeout = interval = avgDebitDownloadLastImage = previousSound = error
 speedAudio = pitchAudio = img_principal_type = 1;
 repetitionInterval = 500;
 modifyFirstClick = true;
-reverbAudio = playFromAPI = compaAudioAPI = vocoderAudio = compatModeChecked = audioContextNotSupported = audioProcessing = removedTooltipInfo = firstInit = false;
+reverbAudio = playFromAPI = compaAudioAPI = vocoderAudio = compatModeChecked = audioContextNotSupported = audioProcessing = saveProcessing = removedTooltipInfo = firstInit = false;
 audio_principal_buffer = audio_impulse_response = audio_modulator = null;
 
 var audioFileName = soundBoxList[0][1];
@@ -160,12 +160,20 @@ function stopSound() {
     } else {
         checkAudio = true;
     }
+
+    compaMode();
 }
 
 function compaMode() {
-    if(!audioProcessing) {
-        if (typeof(Worker) !== "undefined" && Worker != null) {
-            setTooltip("saveInputModify", null, false, true, "wrapperSave", true);
+    compaAudioAPI = document.getElementById("checkCompa").checked;
+
+    if(!audioProcessing && !saveProcessing) {
+        if(typeof(Worker) !== "undefined" && Worker != null) {
+            if(compaAudioAPI && checkAudio != true) {
+                setTooltip("saveInputModify", "Réactivez le son (décocher la case &laquo; Couper le son &raquo;) pour pouvoir enregistrer en mode de compatibilité.", true, false, "wrapperSave", true);
+            } else {
+                setTooltip("saveInputModify", null, false, true, "wrapperSave", true);
+            }
         } else {
             setTooltip("saveInputModify", "Désolé, cette fonction est incompatible avec votre navigateur.", true, false, "wrapperSave", true);
         }
@@ -260,13 +268,15 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
                     }
 
                     if(save) {
+                        saveProcessing = true;
                         saveBuffer(e.renderedBuffer);
+                        saveProcessing = false;
                     }
                 };
 
                 offlineContext.startRendering();
             } else {
-                if(!save) {
+                if(!save && !saveProcessing) {
                     document.getElementById("modify").disabled = false;
                     document.getElementById("validInputModify").disabled = false;
                     document.getElementById("processingModifLoader").style.display = "none";
@@ -303,6 +313,7 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
                 }
 
                 if(play && save) {
+                    saveProcessing = true;
                     rec.record();
 
                     setTimeout(function() {
@@ -315,6 +326,7 @@ function renderAudioAPI(audio, speed, pitch, reverb, save, play, audioName, comp
                             document.getElementById("validInputModify").disabled = false;
                             document.getElementById("processingSave").style.display = "none";
                             audioProcessing = false;
+                            saveProcessing = false;
                             compaMode();
                         });
                     }, durationAudio * 1000);
@@ -480,7 +492,9 @@ function validModify(play, save) {
                 reloadAnimation();
             }
 
-            if(play) {
+            if(save) {
+                renderAudioAPI(audio_principal_buffer, speedAudio, pitchAudio, reverbAudio, true, true, "audio_principal_processed", compaAudioAPI, vocoderAudio);
+            } else if(play) {
                 launchPlay_click();
             }
         } else {
@@ -624,14 +638,6 @@ function launchPlay_modify() {
         document.getElementById("modify").disabled = true;
         validModify(false, false);
         modifyFirstClick = false;
-    }
-}
-
-function launchSave() {
-    if(!audioProcessing && typeof(audio_principal_processed) !== "undefined" && audio_principal_processed != null && !compaAudioAPI) {
-        validModify(false, true);
-    } else if(compaAudioAPI) {
-        renderAudioAPI(audio_principal_buffer, speedAudio, pitchAudio, reverbAudio, true, true, "audio_principal_processed", compaAudioAPI, vocoderAudio);
     }
 }
 
@@ -1038,7 +1044,6 @@ function init(func) {
 
                 checkListSounds();
                 stopSound();
-                compaMode();
                 full();
 
                 setTooltip("animation_img", "Cliquez ici !", false, true,  null, true, true);
