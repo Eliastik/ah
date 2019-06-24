@@ -8,7 +8,7 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 
 ## À propos du programme
 
-* Version du programme : 2.2.3 (08/04/2019)
+* Version du programme : 2.3 (24/06/2019)
 * Made in France by Eliastik - [eliastiksofts.com](http://eliastiksofts.com) - Contact : [eliastiksofts.com/contact](http://eliastiksofts.com/contact)
 * Licence : GNU GPLv3 ([https://github.com/Eliastik/ah/blob/master/LICENCE.txt](https://github.com/Eliastik/ah/blob/master/LICENCE.txt))
 
@@ -25,6 +25,13 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 * Le Ah de Denis Brogniart vient de cette vidéo : [https://www.youtube.com/watch?v=6oTsleGsWT8](https://www.youtube.com/watch?v=6oTsleGsWT8)
 
 ## Journal des changements
+
+* Version 2.3 (24/06/2019) :
+    - Améliorations et corrections venant de [Simple Voice Changer](http://www.eliastiksofts.com/simple-voice-changer) 1.0.3 :
+      - Possibilité d'enregistrer les modifications de la voix même si le mode de compatibilité est activé (auparavant impossible) ;
+      - Réglages aléatoires pour la modification de la voix ;
+      - Corrections de bugs et autres améliorations.
+    - Mise à jour de certaines bibliothèques logicielles.
 
 * Version 2.2.3 (08/04/2019) :
     - Patch venant de [La boîte à Emmanuel Macron](http://www.eliastiksofts.com/memes/macron/) 2.1.2 - voir le fichier README.md de ce programme
