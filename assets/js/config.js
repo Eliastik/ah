@@ -24,7 +24,7 @@
      ["assets/img/ah.gif", 365961],
      ["assets/img/ah_full.gif", 1821614]
  ]; // images to be loaded when launching the app + size
- var audioArray = ["assets/sounds/ah.mp3", "assets/sounds/impulse_response.mp3", "assets/sounds/modulator.mp3"]; // audio to be loaded when launching the app
+ var audioArray = ["assets/sounds/ah.mp3", "assets/sounds/impulse_response.wav", "assets/sounds/modulator.mp3"]; // audio to be loaded when launching the app
 
  var soundBoxList = [ // sound name - path to the sound - path to the animation - size of the animation (bytes)
      ["Ah !", "assets/sounds/ah.mp3", "assets/img/ah.gif", 365961]

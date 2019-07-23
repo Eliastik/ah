@@ -72,6 +72,12 @@ img {
 .navbar-brand > span {
     vertical-align: middle;
 }
+.row-filters {
+    max-width: 400px;
+}
+.border-right {
+    border-right: 1px solid lightgrey;
+}
 /* https://codepen.io/jamesbarnett/pen/yILjk */
 input[type=checkbox] {
     display:none;
