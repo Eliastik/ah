@@ -8,7 +8,7 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 
 ## À propos du programme
 
-* Version du programme : 2.4 (24/07/2019)
+* Version du programme : 2.4.1 (26/07/2019)
 * Made in France by Eliastik - [eliastiksofts.com](http://eliastiksofts.com) - Contact : [eliastiksofts.com/contact](http://eliastiksofts.com/contact)
 * Licence : GNU GPLv3 ([https://github.com/Eliastik/ah/blob/master/LICENCE.txt](https://github.com/Eliastik/ah/blob/master/LICENCE.txt))
 
@@ -25,6 +25,10 @@ Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois q
 * Le Ah de Denis Brogniart vient de cette vidéo : [https://www.youtube.com/watch?v=6oTsleGsWT8](https://www.youtube.com/watch?v=6oTsleGsWT8)
 
 ## Journal des changements
+
+* Version 2.4.1 (26/07/2019) :
+    - Ajout permettant d'utiliser l'application en mode hors-ligne et de se voir proposer l'installation sur les plateformes compatibles ;
+    - Autres corrections.
 
 * Version 2.4 (24/07/2019) :
     - Améliorations et corrections venant de [Simple Voice Changer](http://www.eliastiksofts.com/simple-voice-changer) 1.2.1.1 :
