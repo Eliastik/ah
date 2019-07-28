@@ -21,8 +21,9 @@
  var checkFullEnabled = true;
  var checkFullImg = ["assets/img/ah.gif", "assets/img/ah_full.gif"];
  var imgArray = [
-     ["assets/img/ah.gif", 365961],
-     ["assets/img/ah_full.gif", 1821614]
+    ["assets/img/blank.gif", 43],
+    ["assets/img/ah.gif", 365961],
+    ["assets/img/ah_full.gif", 1821614]
  ]; // images to be loaded when launching the app + size
  var audioArray = ["assets/sounds/ah.mp3", "assets/sounds/impulse_response.wav", "assets/sounds/modulator.mp3"]; // audio to be loaded when launching the app
 

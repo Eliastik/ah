@@ -49,6 +49,7 @@ const CACHE_URLS = [
   "assets/img/icon_192.png",
   "assets/img/icon_512.png",
   "assets/img/favicon.png",
+  "assets/img/blank.gif",
   "assets/img/ah.gif",
   "assets/img/ah_full.gif",
   "assets/js/bootstrap-native-polyfill.min.js",

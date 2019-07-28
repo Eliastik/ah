@@ -31,6 +31,7 @@ audio_principal_buffer = audio_impulse_response = audio_modulator = null;
 
 var audioFileName = soundBoxList[0][1];
 var img_principal_src = soundBoxList[0][2];
+var img_blank_src = imgArray[0][0];
 
 if('AudioContext' in window) {
     try {
@@ -914,7 +915,7 @@ function setTooltip(element, text, disable, enable,  otherElement, byId, display
 
 function reloadAnimation() {
     nb_play = nb_play + 1;
-    document.getElementById("animation_img").src = "#";
+    document.getElementById("animation_img").src = img_blank_src + "?r=" + Date.now();
     document.getElementById("animation_img").src = img_principal_src;
     document.getElementById("nb_play").innerHTML = nb_play;
 }
