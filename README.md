@@ -1,5 +1,7 @@
 ﻿# Denis Brogniart – Ah !
 
+# Obsolète, a été remplacé par le projet [memes-soundbox](https://github.com/Eliastik/memes-soundbox)
+
 Le fameux Ah de Denis Brogniart, directement sur votre navigateur web !
 
 Apparemment, les femmes ne savent pas faire de cabanes. Cliquez autant de fois que vous voulez sur Denis pour qu'il dise Ah, ou faites le répéter en cliquant sur le bouton prévu pour cela. Vous pouvez aussi modifier sa voix !
